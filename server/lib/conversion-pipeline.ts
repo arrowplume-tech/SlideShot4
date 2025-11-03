@@ -1,23 +1,43 @@
 import { HTMLParser } from "./html-parser";
+import { BrowserLayoutCollector } from "./browser-layout-collector";
 import { ElementClassifier } from "./element-classifier";
 import { StyleConverter } from "./style-converter";
 import { PPTXGenerator } from "./pptx-generator";
-import type { ConversionOptions, ConversionLog, PPTXElement } from "@shared/conversion-types";
+import type { ConversionOptions, ConversionLog, PPTXElement, ParsedElement } from "@shared/conversion-types";
 
 export class ConversionPipeline {
   private logs: ConversionLog[] = [];
+  private browserCollector: BrowserLayoutCollector | null = null;
 
   async convert(html: string, options: ConversionOptions): Promise<{ buffer: Buffer; logs: ConversionLog[] }> {
     this.logs = [];
     this.addLog("info", "Starting HTML parsing...");
 
     try {
-      // Step 1: Parse HTML
-      console.log("[ConversionPipeline] Step 1: Parsing HTML, length:", html.length);
-      const parser = new HTMLParser(html);
-      const parsedElements = parser.parse();
-      this.addLog("success", `Parsed ${parsedElements.length} root elements`);
-      console.log("[ConversionPipeline] Parsed elements:", parsedElements.length);
+      let parsedElements: ParsedElement[];
+
+      // Step 1: Parse HTML - use browser-based layout for better accuracy
+      if (options.useBrowserLayout !== false) {
+        console.log("[ConversionPipeline] Step 1: Using browser-based layout collection");
+        this.addLog("info", "Using headless browser for accurate layout calculation...");
+        
+        if (!this.browserCollector) {
+          this.browserCollector = new BrowserLayoutCollector();
+          await this.browserCollector.initialize();
+        }
+
+        const browserElements = await this.browserCollector.collectLayout(html);
+        // Browser elements already have accurate positions, convert to ParsedElement format
+        parsedElements = browserElements as unknown as ParsedElement[];
+        this.addLog("success", `Collected layout from browser: ${parsedElements.length} root elements`);
+        console.log("[ConversionPipeline] Browser-based parsing complete:", parsedElements.length);
+      } else {
+        console.log("[ConversionPipeline] Step 1: Using traditional HTML parsing, length:", html.length);
+        const parser = new HTMLParser(html);
+        parsedElements = parser.parse();
+        this.addLog("success", `Parsed ${parsedElements.length} root elements`);
+        console.log("[ConversionPipeline] Traditional parsing complete:", parsedElements.length);
+      }
 
       // Step 2: Classify elements
       console.log("[ConversionPipeline] Step 2: Classifying elements");
@@ -98,5 +118,12 @@ export class ConversionPipeline {
 
   getLogs(): ConversionLog[] {
     return this.logs;
+  }
+
+  async cleanup(): Promise<void> {
+    if (this.browserCollector) {
+      await this.browserCollector.close();
+      this.browserCollector = null;
+    }
   }
 }

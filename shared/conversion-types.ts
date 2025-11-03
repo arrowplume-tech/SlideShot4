@@ -7,6 +7,7 @@ export const conversionOptionsSchema = z.object({
   preserveImages: z.boolean().optional().default(true),
   optimizeShapes: z.boolean().optional().default(true),
   mergeTextBoxes: z.boolean().optional().default(false),
+  useBrowserLayout: z.boolean().optional().default(true), // Use headless browser for accurate layout
 });
 
 export type ConversionOptions = z.infer<typeof conversionOptionsSchema>;

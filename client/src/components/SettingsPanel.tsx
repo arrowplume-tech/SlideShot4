@@ -13,6 +13,7 @@ interface SettingsPanelProps {
     preserveImages: boolean;
     optimizeShapes: boolean;
     mergeTextBoxes: boolean;
+    useBrowserLayout: boolean;
   };
   onSettingsChange: (settings: SettingsPanelProps["settings"]) => void;
 }
@@ -127,6 +128,19 @@ export default function SettingsPanel({
                   Merge text boxes
                 </Label>
               </div>
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="use-browser-layout"
+                  checked={settings.useBrowserLayout}
+                  onCheckedChange={(checked) =>
+                    updateSetting("useBrowserLayout", checked === true)
+                  }
+                  data-testid="checkbox-use-browser-layout"
+                />
+                <Label htmlFor="use-browser-layout" className="cursor-pointer">
+                  Use browser-based layout (recommended)
+                </Label>
+              </div>
             </div>
           </div>
         </div>
@@ -141,6 +155,7 @@ export default function SettingsPanel({
                 preserveImages: true,
                 optimizeShapes: true,
                 mergeTextBoxes: false,
+                useBrowserLayout: true,
               });
             }}
             data-testid="button-reset-defaults"

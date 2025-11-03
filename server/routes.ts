@@ -27,6 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         preserveImages: options?.preserveImages ?? true,
         optimizeShapes: options?.optimizeShapes ?? true,
         mergeTextBoxes: options?.mergeTextBoxes ?? false,
+        useBrowserLayout: options?.useBrowserLayout ?? true, // Use headless browser by default
       };
 
       // Run conversion pipeline

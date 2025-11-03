@@ -86,6 +86,7 @@ export default function Home() {
     preserveImages: true,
     optimizeShapes: true,
     mergeTextBoxes: false,
+    useBrowserLayout: true, // Use headless browser for accurate layout
   });
 
   const handleTemplateSelect = (templateId: string) => {
