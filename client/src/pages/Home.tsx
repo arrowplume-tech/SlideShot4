@@ -127,7 +127,17 @@ export default function Home() {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Conversion failed";
-      addLog("error", errorMessage);
+      const errorDetails = error instanceof Error && (error as any).stack 
+        ? (error as any).stack 
+        : "";
+      
+      addLog("error", `Conversion failed: ${errorMessage}`);
+      
+      // Add more detailed logging for debugging
+      if (errorDetails) {
+        console.error("Conversion error details:", errorDetails);
+        addLog("error", `Details: ${errorDetails.split('\n')[0]}`);
+      }
       
       toast({
         title: "Conversion Failed",

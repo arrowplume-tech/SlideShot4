@@ -51,12 +51,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         file: buffer.toString("base64"),
       });
     } catch (error) {
-      console.error("Conversion error:", error);
+      console.error("[API] Conversion error:", error);
       
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorStack = error instanceof Error ? error.stack : "";
+      
+      console.error("[API] Error stack:", errorStack);
+      
       res.status(500).json({
         error: "Conversion failed",
         details: errorMessage,
+        stack: process.env.NODE_ENV === "development" ? errorStack : undefined,
+        timestamp: new Date().toISOString(),
       });
     }
   });

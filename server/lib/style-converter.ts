@@ -4,11 +4,17 @@ export class StyleConverter {
   convertStyles(parsedElement: ParsedElement, pptxElement: PPTXElement): void {
     const styles: PPTXStyles = {};
 
-    // Background color / fill
+    // Background color / fill (including gradients)
     if (parsedElement.styles.backgroundColor) {
-      const bgColor = this.convertColor(parsedElement.styles.backgroundColor);
-      if (bgColor && bgColor !== "transparent") {
-        styles.fill = bgColor;
+      // Check if it's a gradient
+      if (this.isGradient(parsedElement.styles.backgroundColor)) {
+        console.log(`[StyleConverter] Gradient detected: ${parsedElement.styles.backgroundColor}`);
+        styles.fill = this.convertGradient(parsedElement.styles.backgroundColor);
+      } else {
+        const bgColor = this.convertColor(parsedElement.styles.backgroundColor);
+        if (bgColor && bgColor !== "transparent") {
+          styles.fill = bgColor;
+        }
       }
     }
 
@@ -140,5 +146,81 @@ export class StyleConverter {
     if (style === "dashed") return "dash";
     if (style === "dotted") return "dot";
     return "solid";
+  }
+
+  private isGradient(cssValue: string): boolean {
+    return cssValue.includes("gradient(");
+  }
+
+  private convertGradient(cssGradient: string): any {
+    console.log(`[StyleConverter] Converting gradient: ${cssGradient}`);
+    
+    // Extract gradient type
+    const isLinear = cssGradient.includes("linear-gradient");
+    const isRadial = cssGradient.includes("radial-gradient");
+    
+    if (!isLinear && !isRadial) {
+      console.warn(`[StyleConverter] Unknown gradient type, defaulting to color`);
+      return undefined;
+    }
+
+    // Extract colors from gradient
+    const colors = this.extractGradientColors(cssGradient);
+    if (colors.length === 0) {
+      console.warn(`[StyleConverter] No colors found in gradient`);
+      return undefined;
+    }
+
+    // Extract angle for linear gradient
+    let angle = 0;
+    if (isLinear) {
+      angle = this.extractGradientAngle(cssGradient);
+    }
+
+    console.log(`[StyleConverter] Gradient processed: ${colors.length} colors, angle: ${angle}°`);
+
+    // PowerPoint gradient format
+    return {
+      type: "gradient",
+      colors: colors.map((color, index) => ({
+        color: this.convertColor(color) || "000000",
+        position: (index / (colors.length - 1)) * 100,
+      })),
+      angle: angle,
+    };
+  }
+
+  private extractGradientColors(gradient: string): string[] {
+    // Extract colors from gradient string
+    // Matches: rgb(r,g,b), rgba(r,g,b,a), #hex, named colors
+    const colorRegex = /(rgba?\([^)]+\)|#[a-fA-F0-9]{3,8}|\b(?:red|blue|green|yellow|white|black|purple|orange|pink|gray|grey)\b)(?:\s+\d+%)?/gi;
+    const matches = gradient.match(colorRegex) || [];
+    
+    // Extract just the color part, removing percentage
+    return matches.map(match => {
+      const colorOnly = match.split(/\s+/)[0];
+      return colorOnly;
+    }).filter(Boolean);
+  }
+
+  private extractGradientAngle(gradient: string): number {
+    // Try to extract angle in degrees
+    const degMatch = gradient.match(/(\d+)deg/);
+    if (degMatch) {
+      return parseInt(degMatch[1]);
+    }
+
+    // Handle named directions
+    if (gradient.includes("to right")) return 90;
+    if (gradient.includes("to left")) return 270;
+    if (gradient.includes("to bottom")) return 180;
+    if (gradient.includes("to top")) return 0;
+    if (gradient.includes("to bottom right")) return 135;
+    if (gradient.includes("to bottom left")) return 225;
+    if (gradient.includes("to top right")) return 45;
+    if (gradient.includes("to top left")) return 315;
+
+    // Default angle
+    return 0;
   }
 }

@@ -83,16 +83,62 @@ export class ElementClassifier {
   }
 
   private isTriangle(element: ParsedElement): boolean {
-    // Detect CSS triangle trick: transparent borders with one colored border
-    const { borderWidth, borderStyle, borderColor, backgroundColor } = element.styles;
+    // Detect CSS triangle trick: width/height = 0 + transparent borders with one colored border
+    const { width, height } = element.position;
+    const { backgroundColor } = element.styles;
     
-    // This is a simplified check - full implementation would be more complex
-    if (!borderWidth || !borderStyle || borderColor === "transparent") return false;
-    if (backgroundColor && backgroundColor !== "transparent") return false;
+    console.log(`[Classifier] Checking triangle for ${element.id}:`, {
+      width, height,
+      styles: element.styles
+    });
     
-    // If border width is significant compared to content
+    // CSS triangles have zero width and height
+    if (width > 0.01 || height > 0.01) {
+      return false;
+    }
+    
+    // Should not have background color
+    if (backgroundColor && backgroundColor !== "transparent" && backgroundColor !== "rgba(0, 0, 0, 0)") {
+      return false;
+    }
+    
+    // Check if element has any visible border (the triangle is made from borders)
+    const hasBorder = this.hasVisibleBorder(element);
+    
+    if (hasBorder) {
+      const borderInfo = this.getTriangleBorderInfo(element);
+      console.log(`[Classifier] Triangle detected! Direction: ${borderInfo.direction}, Color: ${borderInfo.color}`);
+      return true;
+    }
+    
+    return false;
+  }
+
+  private hasVisibleBorder(element: ParsedElement): boolean {
+    const { borderWidth, borderStyle } = element.styles;
+    if (!borderWidth || !borderStyle || borderStyle === "none") return false;
+    
     const borderPx = parseFloat(borderWidth);
-    return borderPx > 10 && element.textContent.trim().length === 0;
+    return borderPx > 0;
+  }
+
+  private getTriangleBorderInfo(element: ParsedElement): { direction: string; color: string } {
+    // In CSS triangles, the colored border determines the direction
+    // border-bottom = triangle pointing up
+    // border-top = triangle pointing down
+    // border-left = triangle pointing right
+    // border-right = triangle pointing left
+    
+    const { borderWidth, borderColor } = element.styles;
+    
+    // For now, use the main border color
+    // TODO: Parse individual border sides (borderBottomColor, etc.)
+    const color = borderColor || "#000000";
+    
+    return {
+      direction: "up", // Default
+      color: color,
+    };
   }
 
   private getClassificationReason(element: ParsedElement, shapeType: PPTXShapeType): string {
