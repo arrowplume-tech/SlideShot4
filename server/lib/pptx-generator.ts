@@ -1,4 +1,4 @@
-import pptxgen from "pptxgenjs";
+import PptxGenJS from "pptxgenjs";
 import type { PPTXElement, ConversionOptions } from "@shared/conversion-types";
 
 export class PPTXGenerator {
@@ -6,7 +6,9 @@ export class PPTXGenerator {
   private options: ConversionOptions;
 
   constructor(options: ConversionOptions) {
-    this.pptx = new pptxgen();
+    // Handle both ESM and CommonJS exports
+    const PptxConstructor = (PptxGenJS as any).default || PptxGenJS;
+    this.pptx = new PptxConstructor();
     this.options = options;
     
     // Set slide dimensions
