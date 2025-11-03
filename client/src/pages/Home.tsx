@@ -5,6 +5,8 @@ import LivePreview from "@/components/LivePreview";
 import ElementsTree from "@/components/ElementsTree";
 import ConversionLog, { LogEntry } from "@/components/ConversionLog";
 import SettingsPanel from "@/components/SettingsPanel";
+import { convertHtmlToPptx, downloadBlob, base64ToBlob } from "@/lib/conversion-api";
+import { useToast } from "@/hooks/use-toast";
 
 const TEMPLATES = {
   blank: "",
@@ -34,6 +36,7 @@ const TEMPLATES = {
 };
 
 export default function Home() {
+  const { toast } = useToast();
   const [htmlCode, setHtmlCode] = useState(TEMPLATES.card);
   const [selectedTemplate, setSelectedTemplate] = useState("card");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -92,26 +95,47 @@ export default function Home() {
   };
 
   const handleConvert = async () => {
+    if (!htmlCode.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter some HTML code to convert",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsConverting(true);
-    addLog("info", "Starting HTML parsing...");
+    addLog("info", "Starting HTML to PowerPoint conversion...");
 
-    setTimeout(() => {
-      addLog("success", "Detected 3 elements: 1 roundRect, 2 text");
-    }, 500);
-
-    setTimeout(() => {
-      addLog("success", "Converting styles to PowerPoint format...");
-    }, 1000);
-
-    setTimeout(() => {
-      addLog("warning", "Complex gradient detected, approximating...");
-    }, 1500);
-
-    setTimeout(() => {
-      addLog("success", "PowerPoint generation complete!");
-      addLog("info", "Download will start automatically...");
+    try {
+      const result = await convertHtmlToPptx(htmlCode, settings);
+      
+      // Add server logs to the UI
+      result.logs.forEach(log => {
+        addLog(log.level, log.message);
+      });
+      
+      // Convert base64 to blob and download
+      const blob = base64ToBlob(result.file);
+      downloadBlob(blob, result.filename);
+      addLog("info", `Downloaded: ${result.filename}`);
+      
+      toast({
+        title: "Success!",
+        description: "Your PowerPoint file has been downloaded",
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Conversion failed";
+      addLog("error", errorMessage);
+      
+      toast({
+        title: "Conversion Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
       setIsConverting(false);
-    }, 2000);
+    }
   };
 
   const addLog = (level: LogEntry["level"], message: string) => {
