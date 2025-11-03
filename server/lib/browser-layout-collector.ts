@@ -87,44 +87,56 @@ export class BrowserLayoutCollector {
 
       console.log("[BrowserLayoutCollector] Extracting layout data from DOM...");
 
-      // Execute script in browser context to collect all element data
-      const layoutData = await page.evaluate(() => {
-        let elementIdCounter = 0;
+      // First, test if page.evaluate works at all
+      try {
+        const simpleTest = await page.evaluate('1 + 1');
+        console.log("[BrowserLayoutCollector] Simple test result:", simpleTest);
+      } catch (err) {
+        console.error("[BrowserLayoutCollector] Simple test failed:", err);
+      }
 
-        function getDirectTextContent(element: Element): string {
-          let text = "";
-          const nodes = Array.from(element.childNodes);
-          for (const node of nodes) {
-            if (node.nodeType === 3) { // Text node
-              text += (node.textContent?.trim() || "");
+      // Execute script in browser context to collect all element data  
+      // Using string-based function to avoid TSX compilation issues
+      const pageFunction = `
+      (function() {
+        var elementIdCounter = 0;
+
+        function getDirectTextContent(element) {
+          var text = "";
+          var nodes = Array.from(element.childNodes);
+          for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (node.nodeType === 3) {
+              var content = node.textContent;
+              if (content) {
+                text += content.trim();
+              }
             }
           }
           return text;
         }
 
-        function shouldSkipElement(element: Element): boolean {
-          const tagName = element.tagName.toLowerCase();
-          const skipTags = ["script", "style", "meta", "link", "title", "head"];
+        function shouldSkipElement(element) {
+          var tagName = element.tagName.toLowerCase();
+          var skipTags = ["script", "style", "meta", "link", "title", "head"];
           if (skipTags.includes(tagName)) return true;
 
-          // Skip if display: none or visibility: hidden
-          const style = window.getComputedStyle(element);
+          var style = window.getComputedStyle(element);
           if (style.display === "none" || style.visibility === "hidden") return true;
 
           return false;
         }
 
-        function collectElementData(element: Element): any {
+        function collectElementData(element) {
           if (shouldSkipElement(element)) return null;
 
-          const rect = element.getBoundingClientRect();
-          const style = window.getComputedStyle(element);
+          var rect = element.getBoundingClientRect();
+          var style = window.getComputedStyle(element);
 
-          // Convert pixels to inches (96 DPI)
-          const pxToInches = (px: number) => px / 96;
+          var pxToInches = function(px) { return px / 96; };
 
-          const data: any = {
-            id: `el-${elementIdCounter++}`,
+          var data = {
+            id: "el-" + (elementIdCounter++),
             tagName: element.tagName.toLowerCase(),
             textContent: getDirectTextContent(element),
             position: {
@@ -147,7 +159,6 @@ export class BrowserLayoutCollector {
               borderWidth: style.borderWidth,
               borderStyle: style.borderStyle,
               borderColor: style.borderColor,
-              // Individual border sides for CSS triangles
               borderTopWidth: style.borderTopWidth,
               borderRightWidth: style.borderRightWidth,
               borderBottomWidth: style.borderBottomWidth,
@@ -166,13 +177,13 @@ export class BrowserLayoutCollector {
               position: style.position,
               opacity: style.opacity,
             },
-            children: [] as any[],
+            children: [],
           };
 
-          // Recursively collect children
-          const children = Array.from(element.children);
-          for (const child of children) {
-            const childData = collectElementData(child);
+          var children = Array.from(element.children);
+          for (var j = 0; j < children.length; j++) {
+            var child = children[j];
+            var childData = collectElementData(child);
             if (childData) {
               data.children.push(childData);
             }
@@ -181,11 +192,21 @@ export class BrowserLayoutCollector {
           return data;
         }
 
-        // Start from body element
-        const body = document.body;
-        const bodyData = collectElementData(body);
-        return bodyData ? bodyData.children : [];
-      });
+        try {
+          var body = document.body;
+          if (!body) {
+            throw new Error("document.body is null");
+          }
+          var bodyData = collectElementData(body);
+          return bodyData ? bodyData.children : [];
+        } catch (error) {
+          console.error("Error in page.evaluate:", error);
+          throw error;
+        }
+      })();
+      `;
+      
+      const layoutData = await page.evaluate(pageFunction) as BrowserElementData[];
 
       console.log(`[BrowserLayoutCollector] Collected layout data for ${this.countElements(layoutData)} elements`);
 
