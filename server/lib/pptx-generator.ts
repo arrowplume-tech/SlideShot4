@@ -46,8 +46,6 @@ export class PPTXGenerator {
   private addElement(slide: any, element: PPTXElement): void {
     const { type, position, styles, text } = element;
 
-    console.log(`[PPTXGenerator] Adding element type: ${type}, position:`, position);
-
     // Prepare common properties
     const commonProps: any = {
       x: position.x,
@@ -73,6 +71,16 @@ export class PPTXGenerator {
       };
     }
 
+    // Log what we're adding
+    const textInfo = text ? `with text: "${text}"` : "no text";
+    console.log(`[PPTXGenerator] Adding ${type} at (${position.x.toFixed(2)}, ${position.y.toFixed(2)}) ${position.width.toFixed(2)}x${position.height.toFixed(2)} ${textInfo}`);
+
+    // Check if shape has text content - this is a problem!
+    if (text && text.trim().length > 0 && type !== "text") {
+      console.warn(`⚠️  [PPTXGenerator] Shape type "${type}" has text "${text}" - TEXT WILL BE LOST!`);
+      console.warn(`    Solution: Add text as separate textbox on top of shape`);
+    }
+
     switch (type) {
       case "text":
         this.addTextBox(slide, element, commonProps);
@@ -80,14 +88,26 @@ export class PPTXGenerator {
       
       case "rect":
         this.addRectangle(slide, commonProps);
+        // If rect has text, add it as a textbox on top
+        if (text && text.trim().length > 0) {
+          this.addTextOverShape(slide, element, commonProps);
+        }
         break;
       
       case "roundRect":
         this.addRoundedRectangle(slide, commonProps);
+        // If roundRect has text, add it as a textbox on top
+        if (text && text.trim().length > 0) {
+          this.addTextOverShape(slide, element, commonProps);
+        }
         break;
       
       case "ellipse":
         this.addEllipse(slide, commonProps);
+        // If ellipse has text, add it as a textbox on top
+        if (text && text.trim().length > 0) {
+          this.addTextOverShape(slide, element, commonProps);
+        }
         break;
       
       case "triangle":
@@ -162,6 +182,34 @@ export class PPTXGenerator {
     }
 
     slide.addShape(this.pptx.ShapeType.line, lineProps);
+  }
+
+  private addTextOverShape(slide: any, element: PPTXElement, props: any): void {
+    const { text, styles } = element;
+    
+    if (!text) return;
+
+    console.log(`[PPTXGenerator] Adding text overlay: "${text}"`);
+
+    const textProps: any = {
+      x: props.x,
+      y: props.y,
+      w: props.w,
+      h: props.h,
+      text: text,
+      fontSize: styles.fontSize || 14,
+      color: styles.color || "FFFFFF",
+      align: styles.align || "center",
+      valign: styles.valign || "middle",
+      bold: styles.bold || false,
+      // Don't set fill - let shape background show through
+    };
+
+    if (styles.fontFace) {
+      textProps.fontFace = styles.fontFace;
+    }
+
+    slide.addText(text, textProps);
   }
 
   async toBuffer(): Promise<Buffer> {

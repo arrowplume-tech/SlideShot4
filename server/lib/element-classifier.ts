@@ -18,6 +18,13 @@ export class ElementClassifier {
       children: element.children.length > 0 ? this.classify(element.children) : undefined,
     };
 
+    // Log classification decision
+    const textWarning = hasText && shapeType !== "text" ? " ⚠️ TEXT WILL BE LOST!" : "";
+    console.log(`[Classifier] ${element.id} <${element.tagName}> → ${shapeType}${textWarning}`, {
+      text: hasText ? `"${element.textContent}"` : "(no text)",
+      reason: this.getClassificationReason(element, shapeType),
+    });
+
     return pptxElement;
   }
 
@@ -86,5 +93,14 @@ export class ElementClassifier {
     // If border width is significant compared to content
     const borderPx = parseFloat(borderWidth);
     return borderPx > 10 && element.textContent.trim().length === 0;
+  }
+
+  private getClassificationReason(element: ParsedElement, shapeType: PPTXShapeType): string {
+    if (shapeType === "text") return "text tag or content-only";
+    if (shapeType === "line") return "hr tag";
+    if (shapeType === "ellipse") return "border-radius: 50% + equal dimensions";
+    if (shapeType === "roundRect") return `border-radius: ${element.styles.borderRadius}`;
+    if (shapeType === "triangle") return "border trick detected";
+    return "default rectangle";
   }
 }

@@ -39,15 +39,24 @@ export class HTMLParser {
     
     const styles = this.extractStyles(computedStyle);
     const position = this.calculatePosition(element, computedStyle);
+    const textContent = this.getDirectTextContent(element);
     
     const parsedElement: ParsedElement = {
       id: `el-${this.elementIdCounter++}`,
       tagName: element.tagName.toLowerCase(),
-      textContent: this.getDirectTextContent(element),
+      textContent,
       styles,
       position,
       children: [],
     };
+
+    // Log detailed element information
+    console.log(`[HTMLParser] Parsed: <${parsedElement.tagName}> id=${parsedElement.id}`, {
+      text: textContent ? `"${textContent}"` : "(no text)",
+      position: `x:${position.x.toFixed(2)}" y:${position.y.toFixed(2)}" w:${position.width.toFixed(2)}" h:${position.height.toFixed(2)}"`,
+      background: styles.backgroundColor || "none",
+      borderRadius: styles.borderRadius || "none",
+    });
 
     // Parse children with a new layout context
     if (element.children.length > 0) {
