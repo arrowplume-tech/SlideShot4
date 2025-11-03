@@ -16,7 +16,15 @@ export class BrowserLayoutCollector {
   async initialize(): Promise<void> {
     try {
       console.log("[BrowserLayoutCollector] Launching headless browser...");
+      
+      // Use system Chromium on NixOS/Replit (find chromium in PATH or /nix/store)
+      const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH 
+        || '/nix/store/qa9cnw4v5xkxyip6mb9kxqfq1z4x2dx1-chromium-138.0.7204.100/bin/chromium';
+      
+      console.log("[BrowserLayoutCollector] Using Chromium at:", executablePath);
+      
       this.browser = await puppeteer.launch({
+        executablePath,
         headless: true,
         args: [
           '--no-sandbox',
