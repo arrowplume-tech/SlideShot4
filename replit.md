@@ -85,7 +85,33 @@ Professional Linear/VS Code-inspired aesthetic:
 - Subtle borders and elevations
 - Responsive multi-panel layout
 
-## Recent Changes
+## Recent Changes (November 2025)
+
+### Browser-Based Layout Collection
+- ✅ Implemented headless Puppeteer/Chrome rendering for accurate layout measurements
+- ✅ Installed system dependencies: glib, nss, nspr, atk, cups, libxkbcommon, gtk3, dbus, pango, cairo, xorg libraries
+- ✅ Created BrowserLayoutCollector using 960×720px viewport (PowerPoint dimensions at 96 DPI)
+- ✅ Added per-side border properties (borderTopWidth, borderRightWidth, etc.) to ComputedStyles
+
+### Enhanced CSS Triangle Detection
+- ✅ Implemented per-side border inspection (checks borderTopWidth, borderBottomWidth individually)
+- ✅ Added transparent color detection for CSS border tricks
+- ✅ Direction detection based on which border side has solid color
+- ✅ Tolerance for near-zero dimensions (0.05 inches ~ 5px)
+
+### Gradient Parsing Improvements
+- ✅ Linear gradient parsing with multiple color stops
+- ✅ Angle parsing (deg, rad, turn units)
+- ✅ Directional keywords (to top, to bottom right, etc.)
+- ✅ Fallback to first color for unsupported gradient types
+
+### Enhanced Logging
+- ✅ Detailed frontend error messages with stack traces
+- ✅ Backend validation error logging with Zod schema details
+- ✅ Conversion pipeline telemetry surfaced to frontend
+- ✅ Browser console error aggregation
+
+### Previous Changes
 - ✅ Implemented complete positioning system with containing block tracking
 - ✅ Added support for position: fixed, absolute, relative, sticky
 - ✅ Implemented left/right/top/bottom CSS property support
