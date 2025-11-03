@@ -1,0 +1,249 @@
+34
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трансформация бизнес-процессов</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .slide-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .slide-header h1 {
+            font-size: 28px;
+            font-weight: 500;
+            color: #0077c8; /* Корпоративный синий */
+            margin: 0;
+        }
+
+        .slide-header p {
+            font-size: 16px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .comparison-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .column {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column h2 {
+            font-size: 22px;
+            font-weight: 700;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .column-before h2 {
+            color: #d32f2f; /* Красный акцент для "Было" */
+            border-bottom: 3px solid #d32f2f;
+        }
+
+        .column-after h2 {
+            color: #388e3c; /* Зеленый акцент для "Стало" */
+            border-bottom: 3px solid #388e3c;
+        }
+
+        .process-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .process-item .icon {
+            font-size: 36px;
+            margin-right: 20px;
+            width: 40px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .column-before .icon {
+            color: #757575;
+        }
+
+        .column-after .icon {
+            color: #0077c8;
+        }
+
+        .process-item .text .title {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .process-item .text .description {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .column-after .it-solution {
+            font-weight: 700;
+            color: #005a9c;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .summary {
+            margin-top: auto; /* Прижимает итог к низу колонки */
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-before {
+            background-color: #ffebee;
+            border-left: 5px solid #d32f2f;
+        }
+
+        .summary-after {
+            background-color: #e8f5e9;
+            border-left: 5px solid #388e3c;
+        }
+
+        .summary .summary-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .summary .summary-text {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+        <div class="slide-header">
+            <h1>Ключевой результат: Трансформация бизнес-процессов</h1>
+            <p>Переход от реактивного управления и разрозненных данных к проактивной, интегрированной модели</p>
+        </div>
+
+        <div class="comparison-container">
+            <div class="column column-before">
+                <h2>КАК БЫЛО</h2>
+
+                <div class="process-item">
+                    <div class="icon">📄</div>
+                    <div class="text">
+                        <div class="title">Ручной сбор и анализ данных</div>
+                        <div class="description">Данные по энергопотреблению и режимам собирались вручную в Excel. Анализ занимал недели, отчеты готовились раз в квартал.</div>
+                    </div>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon">⚙️</div>
+                    <div class="text">
+                        <div class="title">Реактивное управление надежностью</div>
+                        <div class="description">Ремонты проводились по жесткому графику (ППР) или после аварийного отказа. Отсутствовал инструмент для прогнозирования поломок.</div>
+                    </div>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon">📞</div>
+                    <div class="text">
+                        <div class="title">"Слепое" оперативное управление</div>
+                        <div class="description">Диспетчер не видел полную картину сети в реальном времени. Поиск причин аварий занимал часы и требовал выезда бригад.</div>
+                    </div>
+                </div>
+
+                 <div class="process-item">
+                    <div class="icon">🚶</div>
+                    <div class="text">
+                        <div class="title">Бумажная работа "в поле"</div>
+                        <div class="description">Электромонтеры заполняли бумажные журналы и листы осмотра, которые затем вручную переносились в системы.</div>
+                    </div>
+                </div>
+
+                <div class="summary summary-before">
+                    <div class="summary-title">Итог:</div>
+                    <div class="summary-text">Высокие трудозатраты, длительное время реакции на инциденты, упущенные возможности для оптимизации.</div>
+                </div>
+
+            </div>
+
+            <div class="column column-after">
+                <h2>КАК СТАЛО</h2>
+
+                 <div class="process-item">
+                    <div class="icon">📈</div>
+                    <div class="text">
+                        <div class="title">Автоматизированный анализ и поиск потенциала</div>
+                        <div class="description">Данные собираются автоматически. Система находит неэффективные объекты и рассчитывает потенциал экономии.<span class="it-solution">Решение: ИАС ЭЭ БРД</span></div>
+                    </div>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon">🧠</div>
+                    <div class="text">
+                        <div class="title">Предиктивное управление надежностью</div>
+                        <div class="description">Модели ИИ анализируют данные телеметрии, прогнозируют отказы оборудования и формируют рекомендации на упреждающий ремонт.<span class="it-solution">Решение: ПРАНА / ПАПА</span></div>
+                    </div>
+                </div>
+
+                <div class="process-item">
+                    <div class="icon">🌐</div>
+                    <div class="text">
+                        <div class="title">"Всевидящее" оперативное управление</div>
+                        <div class="description">Диспетчер видит всю энергосистему на мнемосхеме в реальном времени, может моделировать режимы и оперативно реагировать на отклонения.<span class="it-solution">Решение: СК-11 (СДУЭ)</span></div>
+                    </div>
+                </div>
+
+                 <div class="process-item">
+                    <div class="icon">📱</div>
+                    <div class="text">
+                        <div class="title">Цифровая работа "в поле"</div>
+                        <div class="description">Персонал получает задания и вносит результаты осмотров через мобильное приложение, данные мгновенно попадают в систему.<span class="it-solution">Решение: Мобильный энергетик</span></div>
+                    </div>
+                </div>
+
+                <div class="summary summary-after">
+                    <div class="summary-title">Прогнозируемый эффект:</div>
+                    <div class="summary-text">Снижение ТРЗ на **Х%**, сокращение аварийности на **Y%**, экономия на закупках ЭЭ до **Z млн руб/год**.</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
