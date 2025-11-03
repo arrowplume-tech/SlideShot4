@@ -43,6 +43,19 @@ export interface ComputedStyles {
   borderWidth?: string;
   borderStyle?: string;
   borderColor?: string;
+  // Individual border sides (for CSS triangles)
+  borderTopWidth?: string;
+  borderRightWidth?: string;
+  borderBottomWidth?: string;
+  borderLeftWidth?: string;
+  borderTopColor?: string;
+  borderRightColor?: string;
+  borderBottomColor?: string;
+  borderLeftColor?: string;
+  borderTopStyle?: string;
+  borderRightStyle?: string;
+  borderBottomStyle?: string;
+  borderLeftStyle?: string;
   padding?: string;
   margin?: string;
   display?: string;

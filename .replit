@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["glib", "nss", "nspr", "atk", "cups", "expat", "alsa-lib", "gtk3", "pango", "cairo", "gdk-pixbuf", "libdrm", "mesa", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr", "xorg.libxcb", "dbus", "at-spi2-atk", "at-spi2-core"]
+packages = ["glib", "nss", "nspr", "atk", "cups", "expat", "alsa-lib", "gtk3", "pango", "cairo", "gdk-pixbuf", "libdrm", "mesa", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr", "xorg.libxcb", "dbus", "at-spi2-atk", "at-spi2-core", "libxkbcommon"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -16,8 +16,16 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
+localPort = 33127
+externalPort = 3002
+
+[[ports]]
 localPort = 33519
 externalPort = 3001
+
+[[ports]]
+localPort = 44285
+externalPort = 3003
 
 [[ports]]
 localPort = 46503
@@ -46,3 +54,6 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[agent]
+expertMode = true

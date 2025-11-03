@@ -87,13 +87,10 @@ export class ElementClassifier {
     const { width, height } = element.position;
     const { backgroundColor } = element.styles;
     
-    console.log(`[Classifier] Checking triangle for ${element.id}:`, {
-      width, height,
-      styles: element.styles
-    });
+    // CSS triangles have zero or near-zero width and height
+    const isZeroDimensions = width < 0.05 && height < 0.05; // 0.05 inches ~ 5px tolerance
     
-    // CSS triangles have zero width and height
-    if (width > 0.01 || height > 0.01) {
+    if (!isZeroDimensions) {
       return false;
     }
     
@@ -103,42 +100,58 @@ export class ElementClassifier {
     }
     
     // Check if element has any visible border (the triangle is made from borders)
-    const hasBorder = this.hasVisibleBorder(element);
+    const borderInfo = this.getVisibleBorderSide(element);
     
-    if (hasBorder) {
-      const borderInfo = this.getTriangleBorderInfo(element);
-      console.log(`[Classifier] Triangle detected! Direction: ${borderInfo.direction}, Color: ${borderInfo.color}`);
+    if (borderInfo) {
+      console.log(`[Classifier] Triangle detected for ${element.id}! Direction: ${borderInfo.direction}, Color: ${borderInfo.color}, Width: ${borderInfo.width}px`);
       return true;
     }
     
     return false;
   }
 
-  private hasVisibleBorder(element: ParsedElement): boolean {
-    const { borderWidth, borderStyle } = element.styles;
-    if (!borderWidth || !borderStyle || borderStyle === "none") return false;
-    
-    const borderPx = parseFloat(borderWidth);
-    return borderPx > 0;
+  private getVisibleBorderSide(element: ParsedElement): { direction: string; color: string; width: number } | null {
+    // CSS triangles have one solid colored border and transparent borders on other sides
+    const { 
+      borderTopWidth, borderRightWidth, borderBottomWidth, borderLeftWidth,
+      borderTopColor, borderRightColor, borderBottomColor, borderLeftColor,
+      borderTopStyle, borderRightStyle, borderBottomStyle, borderLeftStyle
+    } = element.styles;
+
+    const borders = [
+      { side: 'top', width: borderTopWidth, color: borderTopColor, style: borderTopStyle, direction: 'down' },
+      { side: 'right', width: borderRightWidth, color: borderRightColor, style: borderRightStyle, direction: 'left' },
+      { side: 'bottom', width: borderBottomWidth, color: borderBottomColor, style: borderBottomStyle, direction: 'up' },
+      { side: 'left', width: borderLeftWidth, color: borderLeftColor, style: borderLeftStyle, direction: 'right' },
+    ];
+
+    // Find the border that is solid and has a non-transparent color
+    for (const border of borders) {
+      if (!border.width || !border.color || !border.style) continue;
+      
+      const widthPx = parseFloat(border.width);
+      const isSolid = border.style === 'solid';
+      const isNotTransparent = border.color !== 'transparent' && 
+                               border.color !== 'rgba(0, 0, 0, 0)' &&
+                               !border.color.includes('transparent');
+      
+      if (widthPx > 0 && isSolid && isNotTransparent) {
+        console.log(`[Classifier] Found visible border on ${border.side}: ${widthPx}px, ${border.color}`);
+        return {
+          direction: border.direction,
+          color: border.color,
+          width: widthPx,
+        };
+      }
+    }
+
+    return null;
   }
 
   private getTriangleBorderInfo(element: ParsedElement): { direction: string; color: string } {
-    // In CSS triangles, the colored border determines the direction
-    // border-bottom = triangle pointing up
-    // border-top = triangle pointing down
-    // border-left = triangle pointing right
-    // border-right = triangle pointing left
-    
-    const { borderWidth, borderColor } = element.styles;
-    
-    // For now, use the main border color
-    // TODO: Parse individual border sides (borderBottomColor, etc.)
-    const color = borderColor || "#000000";
-    
-    return {
-      direction: "up", // Default
-      color: color,
-    };
+    // This method is now deprecated in favor of getVisibleBorderSide
+    const borderInfo = this.getVisibleBorderSide(element);
+    return borderInfo || { direction: 'up', color: '#000000' };
   }
 
   private getClassificationReason(element: ParsedElement, shapeType: PPTXShapeType): string {
