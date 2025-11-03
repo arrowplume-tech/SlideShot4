@@ -24,8 +24,12 @@ export async function convertHtmlToPptx(
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: "Conversion failed" }));
-    throw new Error(error.error || error.details || "Conversion failed");
+    const error = await response.json().catch(() => ({ 
+      error: "Ошибка конвертации", 
+      details: `HTTP ${response.status} ${response.statusText}` 
+    }));
+    const errorMessage = error.details || error.error || "Ошибка конвертации";
+    throw new Error(errorMessage);
   }
 
   return response.json();

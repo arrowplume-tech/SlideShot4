@@ -18,19 +18,29 @@ export class ConversionPipeline {
 
       // Step 1: Parse HTML - use browser-based layout for better accuracy
       if (options.useBrowserLayout !== false) {
-        console.log("[ConversionPipeline] Step 1: Using browser-based layout collection");
-        this.addLog("info", "Using headless browser for accurate layout calculation...");
+        console.log("[ConversionPipeline] Step 1: Attempting browser-based layout collection");
+        this.addLog("info", "Trying headless browser for accurate layout calculation...");
         
-        if (!this.browserCollector) {
-          this.browserCollector = new BrowserLayoutCollector();
-          await this.browserCollector.initialize();
-        }
+        try {
+          if (!this.browserCollector) {
+            this.browserCollector = new BrowserLayoutCollector();
+            await this.browserCollector.initialize();
+          }
 
-        const browserElements = await this.browserCollector.collectLayout(html);
-        // Browser elements already have accurate positions, convert to ParsedElement format
-        parsedElements = browserElements as unknown as ParsedElement[];
-        this.addLog("success", `Collected layout from browser: ${parsedElements.length} root elements`);
-        console.log("[ConversionPipeline] Browser-based parsing complete:", parsedElements.length);
+          const browserElements = await this.browserCollector.collectLayout(html);
+          parsedElements = browserElements as unknown as ParsedElement[];
+          this.addLog("success", `Layout collected from browser: ${parsedElements.length} root elements`);
+          console.log("[ConversionPipeline] Browser-based parsing complete:", parsedElements.length);
+        } catch (browserError) {
+          const errorMsg = browserError instanceof Error ? browserError.message : String(browserError);
+          console.warn("[ConversionPipeline] Browser layout failed, falling back to traditional parser:", errorMsg);
+          this.addLog("warning", `Браузер недоступен, используется традиционный парсер HTML`);
+          
+          const parser = new HTMLParser(html);
+          parsedElements = parser.parse();
+          this.addLog("info", `Парсинг выполнен традиционным методом: ${parsedElements.length} элементов`);
+          console.log("[ConversionPipeline] Fallback parsing complete:", parsedElements.length);
+        }
       } else {
         console.log("[ConversionPipeline] Step 1: Using traditional HTML parsing, length:", html.length);
         const parser = new HTMLParser(html);

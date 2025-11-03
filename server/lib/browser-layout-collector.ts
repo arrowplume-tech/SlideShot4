@@ -14,20 +14,28 @@ export class BrowserLayoutCollector {
   private browser: Browser | null = null;
 
   async initialize(): Promise<void> {
-    console.log("[BrowserLayoutCollector] Launching headless browser...");
-    this.browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu'
-      ],
-    });
-    console.log("[BrowserLayoutCollector] Browser launched successfully");
+    try {
+      console.log("[BrowserLayoutCollector] Launching headless browser...");
+      this.browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--disable-gpu'
+        ],
+      });
+      console.log("[BrowserLayoutCollector] Browser launched successfully");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      console.error("[BrowserLayoutCollector] Failed to launch browser:", errorMessage);
+      console.error("[BrowserLayoutCollector] Error stack:", errorStack);
+      throw new Error(`Не удалось запустить браузер для анализа HTML. Ошибка: ${errorMessage}`);
+    }
   }
 
   async collectLayout(html: string): Promise<BrowserElementData[]> {

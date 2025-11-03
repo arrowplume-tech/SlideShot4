@@ -87,11 +87,26 @@ Professional Linear/VS Code-inspired aesthetic:
 
 ## Recent Changes (November 2025)
 
+### Robust Error Handling & Fallback System (November 3, 2025)
+- ✅ **Automatic Fallback**: Conversion pipeline now automatically falls back to traditional HTML parser if Puppeteer/browser fails
+- ✅ **Enhanced Error Logging**: 
+  - Added detailed Russian error messages throughout the pipeline
+  - Browser initialization errors now show full stack traces in console
+  - Frontend shows specific error details instead of generic "Conversion failed"
+  - Conversion logs display warnings when browser is unavailable
+- ✅ **Fixed React Warnings**: 
+  - Resolved duplicate key issues in conversion logs (added unique random IDs)
+  - Log entries now use `${Date.now()}-${Math.random()}` for guaranteed uniqueness
+- ✅ **System Dependencies**: Attempted installation of mesa, libdrm, xorg.libxshmfence for Puppeteer support
+  - Note: libgbm.so.1 still unavailable in current environment
+  - Fallback parser ensures conversion works regardless of browser availability
+
 ### Browser-Based Layout Collection
 - ✅ Implemented headless Puppeteer/Chrome rendering for accurate layout measurements
 - ✅ Installed system dependencies: glib, nss, nspr, atk, cups, libxkbcommon, gtk3, dbus, pango, cairo, xorg libraries
 - ✅ Created BrowserLayoutCollector using 960×720px viewport (PowerPoint dimensions at 96 DPI)
 - ✅ Added per-side border properties (borderTopWidth, borderRightWidth, etc.) to ComputedStyles
+- ⚠️ Browser layout currently disabled due to missing libgbm.so.1 - traditional parser used as fallback
 
 ### Enhanced CSS Triangle Detection
 - ✅ Implemented per-side border inspection (checks borderTopWidth, borderBottomWidth individually)
@@ -110,6 +125,7 @@ Professional Linear/VS Code-inspired aesthetic:
 - ✅ Backend validation error logging with Zod schema details
 - ✅ Conversion pipeline telemetry surfaced to frontend
 - ✅ Browser console error aggregation
+- ✅ Comprehensive logging at every pipeline stage (parser, classifier, converter, generator)
 
 ### Previous Changes
 - ✅ Implemented complete positioning system with containing block tracking
