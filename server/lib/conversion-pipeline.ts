@@ -13,28 +13,38 @@ export class ConversionPipeline {
 
     try {
       // Step 1: Parse HTML
+      console.log("[ConversionPipeline] Step 1: Parsing HTML, length:", html.length);
       const parser = new HTMLParser(html);
       const parsedElements = parser.parse();
       this.addLog("success", `Parsed ${parsedElements.length} root elements`);
+      console.log("[ConversionPipeline] Parsed elements:", parsedElements.length);
 
       // Step 2: Classify elements
+      console.log("[ConversionPipeline] Step 2: Classifying elements");
       const classifier = new ElementClassifier();
       const classifiedElements = classifier.classify(parsedElements);
       const elementCount = this.countElements(classifiedElements);
       this.addLog("success", `Classified ${elementCount} PowerPoint elements`);
+      console.log("[ConversionPipeline] Classified element count:", elementCount);
 
       // Step 3: Convert styles
+      console.log("[ConversionPipeline] Step 3: Converting styles");
       const styleConverter = new StyleConverter();
       this.convertAllStyles(parsedElements, classifiedElements, styleConverter);
       this.addLog("success", "Converted CSS styles to PowerPoint format");
+      console.log("[ConversionPipeline] Styles converted successfully");
 
       // Step 4: Generate PPTX
+      console.log("[ConversionPipeline] Step 4: Generating PPTX");
+      this.addLog("info", "Generating PowerPoint file...");
       const generator = new PPTXGenerator(options);
       generator.generate(classifiedElements);
-      this.addLog("info", "Generating PowerPoint file...");
+      console.log("[ConversionPipeline] PPTX structure generated");
 
+      console.log("[ConversionPipeline] Converting to buffer...");
       const buffer = await generator.toBuffer();
       this.addLog("success", "PowerPoint generation complete!");
+      console.log("[ConversionPipeline] Buffer created, size:", buffer.length);
 
       return {
         buffer,
@@ -42,6 +52,9 @@ export class ConversionPipeline {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorStack = error instanceof Error ? error.stack : "";
+      console.error("[ConversionPipeline] ERROR:", errorMessage);
+      console.error("[ConversionPipeline] Stack:", errorStack);
       this.addLog("error", `Conversion failed: ${errorMessage}`);
       throw error;
     }

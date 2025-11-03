@@ -1,12 +1,12 @@
-import PptxGenJS from "pptxgenjs";
+import pptxgen from "pptxgenjs";
 import type { PPTXElement, ConversionOptions } from "@shared/conversion-types";
 
 export class PPTXGenerator {
-  private pptx: PptxGenJS;
+  private pptx: any;
   private options: ConversionOptions;
 
   constructor(options: ConversionOptions) {
-    this.pptx = new PptxGenJS();
+    this.pptx = new pptxgen();
     this.options = options;
     
     // Set slide dimensions
@@ -19,8 +19,10 @@ export class PPTXGenerator {
     this.pptx.layout = "CUSTOM";
   }
 
-  generate(elements: PPTXElement[]): PptxGenJS {
+  generate(elements: PPTXElement[]): any {
     const slide = this.pptx.addSlide();
+    
+    console.log(`[PPTXGenerator] Adding ${elements.length} elements to slide`);
     
     // Add elements to slide
     this.addElementsToSlide(slide, elements);
@@ -41,6 +43,8 @@ export class PPTXGenerator {
 
   private addElement(slide: any, element: PPTXElement): void {
     const { type, position, styles, text } = element;
+
+    console.log(`[PPTXGenerator] Adding element type: ${type}, position:`, position);
 
     // Prepare common properties
     const commonProps: any = {

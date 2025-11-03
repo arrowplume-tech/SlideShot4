@@ -30,8 +30,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Run conversion pipeline
+      console.log("[API] Starting conversion with options:", conversionOptions);
       const pipeline = new ConversionPipeline();
       const { buffer, logs } = await pipeline.convert(html, conversionOptions);
+      console.log("[API] Conversion completed successfully, buffer size:", buffer.length);
 
       // Return JSON with logs and download info instead of direct binary
       // This allows the frontend to receive logs and then trigger download
