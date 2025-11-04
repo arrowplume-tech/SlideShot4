@@ -7,6 +7,8 @@ import { conversionRequestSchema } from "@shared/conversion-types";
 export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/convert - Convert HTML to PowerPoint
   app.post("/api/convert", async (req, res) => {
+    const pipeline = new ConversionPipeline();
+    
     try {
       // Validate request body
       const validation = conversionRequestSchema.safeParse(req.body);
@@ -27,12 +29,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         preserveImages: options?.preserveImages ?? true,
         optimizeShapes: options?.optimizeShapes ?? true,
         mergeTextBoxes: options?.mergeTextBoxes ?? false,
-        useBrowserLayout: options?.useBrowserLayout ?? true, // Use headless browser by default
+        useBrowserLayout: options?.useBrowserLayout ?? true,
       };
 
       // Run conversion pipeline
       console.log("[API] Starting conversion with options:", conversionOptions);
-      const pipeline = new ConversionPipeline();
       const { buffer, logs } = await pipeline.convert(html, conversionOptions);
       console.log("[API] Conversion completed successfully, buffer size:", buffer.length);
 
@@ -47,7 +48,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })),
         downloadUrl: `/api/convert/download/${Date.now()}`,
         filename: `slideshot-${Date.now()}.pptx`,
-        // Encode buffer as base64 for JSON transport
         file: buffer.toString("base64"),
       });
     } catch (error) {
@@ -64,6 +64,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         stack: process.env.NODE_ENV === "development" ? errorStack : undefined,
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      await pipeline.cleanup();
+      console.log("[API] Pipeline cleanup completed");
     }
   });
 
