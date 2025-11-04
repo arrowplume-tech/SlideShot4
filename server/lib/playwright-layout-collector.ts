@@ -197,10 +197,14 @@ export class PlaywrightLayoutCollector {
 
       console.log(`[PlaywrightLayoutCollector] Collected layout data for ${this.countElements(layoutData)} elements`);
       
+      // Normalize coordinates - find min x,y and shift all elements to start from (0,0)
+      const normalized = this.normalizeCoordinates(layoutData);
+      console.log(`[PlaywrightLayoutCollector] Coordinates normalized to start from (0, 0)`);
+      
       // Log detailed information about each top-level element
-      this.logDetailedElementInfo(layoutData, 0);
+      this.logDetailedElementInfo(normalized, 0);
 
-      return layoutData;
+      return normalized;
 
     } finally {
       await page.close();
@@ -258,6 +262,45 @@ export class PlaywrightLayoutCollector {
         this.logDetailedElementInfo(el.children, depth + 1);
       }
     }
+  }
+
+  private normalizeCoordinates(elements: BrowserElementData[]): BrowserElementData[] {
+    // Find minimum x and y across all elements (including nested)
+    let minX = Infinity;
+    let minY = Infinity;
+
+    const findMinCoordinates = (els: BrowserElementData[]) => {
+      for (const el of els) {
+        minX = Math.min(minX, el.position.x);
+        minY = Math.min(minY, el.position.y);
+        if (el.children && el.children.length > 0) {
+          findMinCoordinates(el.children);
+        }
+      }
+    };
+
+    findMinCoordinates(elements);
+
+    // If minX or minY are negative or > 0, shift all elements
+    if (minX !== 0 || minY !== 0) {
+      console.log(`[PlaywrightLayoutCollector] Shifting coordinates by (-${minX.toFixed(2)}", -${minY.toFixed(2)}")`);
+      
+      const shiftCoordinates = (els: BrowserElementData[]): BrowserElementData[] => {
+        return els.map(el => ({
+          ...el,
+          position: {
+            ...el.position,
+            x: el.position.x - minX,
+            y: el.position.y - minY,
+          },
+          children: shiftCoordinates(el.children),
+        }));
+      };
+
+      return shiftCoordinates(elements);
+    }
+
+    return elements;
   }
 
   async close(): Promise<void> {
