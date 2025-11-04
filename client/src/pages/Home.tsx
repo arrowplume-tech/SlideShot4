@@ -10,6 +10,96 @@ import { useToast } from "@/hooks/use-toast";
 
 const TEMPLATES = {
   blank: "",
+  businessTransformation: `<div style="width: 100%; max-width: 1200px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); padding: 40px; box-sizing: border-box; font-family: 'Roboto', Arial, sans-serif;">
+  <div style="text-align: center; margin-bottom: 40px;">
+    <h1 style="font-size: 28px; font-weight: 500; color: #0077c8; margin: 0;">Ключевой результат: Трансформация бизнес-процессов</h1>
+    <p style="font-size: 16px; color: #777; margin-top: 5px;">Переход от реактивного управления и разрозненных данных к проактивной, интегрированной модели</p>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; gap: 40px;">
+    <div style="width: 48%; display: flex; flex-direction: column;">
+      <h2 style="font-size: 22px; font-weight: 700; padding-bottom: 10px; margin-bottom: 20px; text-align: center; color: #d32f2f; border-bottom: 3px solid #d32f2f;">КАК БЫЛО</h2>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #757575;">📄</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">Ручной сбор и анализ данных</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Данные по энергопотреблению и режимам собирались вручную в Excel. Анализ занимал недели, отчеты готовились раз в квартал.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #757575;">⚙️</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">Реактивное управление надежностью</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Ремонты проводились по жесткому графику (ППР) или после аварийного отказа. Отсутствовал инструмент для прогнозирования поломок.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #757575;">📞</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">"Слепое" оперативное управление</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Диспетчер не видел полную картину сети в реальном времени. Поиск причин аварий занимал часы и требовал выезда бригад.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #757575;">🚶</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">Бумажная работа "в поле"</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Электромонтеры заполняли бумажные журналы и листы осмотра, которые затем вручную переносились в системы.</div>
+        </div>
+      </div>
+
+      <div style="margin-top: auto; padding: 15px; border-radius: 8px; text-align: center; background-color: #ffebee; border-left: 5px solid #d32f2f;">
+        <div style="font-weight: 700; font-size: 16px; margin-bottom: 5px;">Итог:</div>
+        <div style="font-size: 14px;">Высокие трудозатраты, длительное время реакции на инциденты, упущенные возможности для оптимизации.</div>
+      </div>
+    </div>
+
+    <div style="width: 48%; display: flex; flex-direction: column;">
+      <h2 style="font-size: 22px; font-weight: 700; padding-bottom: 10px; margin-bottom: 20px; text-align: center; color: #388e3c; border-bottom: 3px solid #388e3c;">КАК СТАЛО</h2>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #0077c8;">📈</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">Автоматизированный анализ и поиск потенциала</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Данные собираются автоматически. Система находит неэффективные объекты и рассчитывает потенциал экономии.<span style="font-weight: 700; color: #005a9c; display: block; margin-top: 5px;">Решение: ИАС ЭЭ БРД</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #0077c8;">🧠</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">Предиктивное управление надежностью</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Модели ИИ анализируют данные телеметрии, прогнозируют отказы оборудования и формируют рекомендации на упреждающий ремонт.<span style="font-weight: 700; color: #005a9c; display: block; margin-top: 5px;">Решение: ПРАНА / ПАПА</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #0077c8;">🌐</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">"Всевидящее" оперативное управление</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Диспетчер видит всю энергосистему на мнемосхеме в реальном времени, может моделировать режимы и оперативно реагировать на отклонения.<span style="font-weight: 700; color: #005a9c; display: block; margin-top: 5px;">Решение: СК-11 (СДУЭ)</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+        <div style="font-size: 36px; margin-right: 20px; width: 40px; text-align: center; flex-shrink: 0; color: #0077c8;">📱</div>
+        <div>
+          <div style="font-weight: 500; font-size: 16px; margin-bottom: 5px;">Цифровая работа "в поле"</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #555;">Персонал получает задания и вносит результаты осмотров через мобильное приложение, данные мгновенно попадают в систему.<span style="font-weight: 700; color: #005a9c; display: block; margin-top: 5px;">Решение: Мобильный энергетик</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top: auto; padding: 15px; border-radius: 8px; text-align: center; background-color: #e8f5e9; border-left: 5px solid #388e3c;">
+        <div style="font-weight: 700; font-size: 16px; margin-bottom: 5px;">Прогнозируемый эффект:</div>
+        <div style="font-size: 14px;">Снижение ТРЗ на **Х%**, сокращение аварийности на **Y%**, экономия на закупках ЭЭ до **Z млн руб/год**.</div>
+      </div>
+    </div>
+  </div>
+</div>`,
   card: `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 12px; color: white; max-width: 400px;">
   <h1 style="margin: 0 0 16px 0; font-size: 32px;">Card Title</h1>
   <p style="margin: 0; opacity: 0.9;">This is a beautiful gradient card component that will be converted to native PowerPoint shapes.</p>

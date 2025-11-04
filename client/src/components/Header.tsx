@@ -39,6 +39,7 @@ export default function Header({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="blank">Blank</SelectItem>
+            <SelectItem value="businessTransformation">Business Transformation</SelectItem>
             <SelectItem value="card">Card Component</SelectItem>
             <SelectItem value="hero">Hero Section</SelectItem>
             <SelectItem value="pricing">Pricing Table</SelectItem>
