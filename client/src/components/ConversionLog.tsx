@@ -1,12 +1,22 @@
 import { useState } from "react";
-import { ChevronUp, ChevronDown, Trash2, CheckCircle, AlertTriangle, XCircle, Circle } from "lucide-react";
+import { ChevronUp, ChevronDown, Trash2, CheckCircle, AlertTriangle, XCircle, Circle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface LogEntry {
   id: string;
   timestamp: Date;
-  level: "success" | "warning" | "error" | "info";
+  level: "success" | "warning" | "error" | "info" | "element";
   message: string;
+  elementData?: {
+    id: string;
+    tag: string;
+    text: string;
+    htmlPosition?: string;
+    pptxPosition?: string;
+    pptxType?: string;
+    status?: "ok" | "warning" | "error";
+    issue?: string;
+  };
 }
 
 interface ConversionLogProps {
@@ -25,9 +35,25 @@ export default function ConversionLog({ logs, onClear }: ConversionLogProps) {
         return <AlertTriangle className="h-3 w-3 text-yellow-500" />;
       case "error":
         return <XCircle className="h-3 w-3 text-red-500" />;
+      case "element":
+        return <Code className="h-3 w-3 text-purple-500" />;
       default:
         return <Circle className="h-3 w-3 text-blue-500" />;
     }
+  };
+  
+  const getStatusBadge = (status?: "ok" | "warning" | "error") => {
+    if (!status) return null;
+    const colors = {
+      ok: "text-green-600 bg-green-50",
+      warning: "text-yellow-600 bg-yellow-50",
+      error: "text-red-600 bg-red-50",
+    };
+    return (
+      <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${colors[status]}`}>
+        {status}
+      </span>
+    );
   };
 
   return (
@@ -81,14 +107,33 @@ export default function ConversionLog({ logs, onClear }: ConversionLogProps) {
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex gap-3 text-xs font-mono"
+                  className={log.level === "element" ? "border-l-2 border-purple-300 pl-2 py-1" : ""}
                   data-testid={`log-entry-${log.level}`}
                 >
-                  <span className="text-muted-foreground">
-                    {log.timestamp.toLocaleTimeString()}
-                  </span>
-                  {getIcon(log.level)}
-                  <span>{log.message}</span>
+                  <div className="flex gap-3 text-xs font-mono">
+                    <span className="text-muted-foreground">
+                      {log.timestamp.toLocaleTimeString()}
+                    </span>
+                    {getIcon(log.level)}
+                    <span className="flex-1">{log.message}</span>
+                    {log.elementData && getStatusBadge(log.elementData.status)}
+                  </div>
+                  {log.elementData && (
+                    <div className="ml-10 mt-1 space-y-1 text-[10px] text-muted-foreground">
+                      {log.elementData.text && (
+                        <div>📝 Текст: <span className="text-foreground">{log.elementData.text}</span></div>
+                      )}
+                      {log.elementData.htmlPosition && (
+                        <div>📍 HTML: <span className="text-foreground font-mono">{log.elementData.htmlPosition}</span></div>
+                      )}
+                      {log.elementData.pptxPosition && (
+                        <div>🎯 PPTX: <span className="text-foreground font-mono">{log.elementData.pptxPosition}</span></div>
+                      )}
+                      {log.elementData.issue && (
+                        <div className="text-yellow-600">⚠️ {log.elementData.issue}</div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

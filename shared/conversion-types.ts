@@ -111,7 +111,17 @@ export interface PPTXStyles {
 
 // Conversion log
 export interface ConversionLog {
-  level: "info" | "success" | "warning" | "error";
+  level: "info" | "success" | "warning" | "error" | "element";
   message: string;
   timestamp: Date;
+  elementData?: {
+    id: string;
+    tag: string;
+    text: string;
+    htmlPosition?: string;
+    pptxPosition?: string;
+    pptxType?: string;
+    status?: "ok" | "warning" | "error";
+    issue?: string;
+  };
 }

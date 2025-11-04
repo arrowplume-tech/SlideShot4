@@ -74,7 +74,11 @@ export class PlaywrightLayoutCollector {
         </html>
       `;
 
-      await page.setContent(fullHtml, { waitUntil: "networkidle" });
+      // Use 'load' instead of 'networkidle' to avoid timeout on external resources (Google Fonts, etc)
+      await page.setContent(fullHtml, { 
+        waitUntil: "load",
+        timeout: 60000  // 60 seconds timeout for complex HTML
+      });
 
       console.log("[PlaywrightLayoutCollector] Extracting layout data from DOM...");
 

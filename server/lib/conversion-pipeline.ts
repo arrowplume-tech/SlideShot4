@@ -63,6 +63,11 @@ export class ConversionPipeline {
       this.convertAllStyles(parsedElements, classifiedElements, styleConverter);
       this.addLog("success", "Converted CSS styles to PowerPoint format");
       console.log("[ConversionPipeline] Styles converted successfully");
+      
+      // Step 3.5: Log detailed element transformations
+      console.log("[ConversionPipeline] Step 3.5: Logging element transformations");
+      this.addLog("info", "📊 Детальный анализ трансформации элементов:");
+      this.logAllElementTransformations(parsedElements, classifiedElements);
 
       // Step 4: Generate PPTX
       console.log("[ConversionPipeline] Step 4: Generating PPTX");
@@ -108,6 +113,22 @@ export class ConversionPipeline {
     }
   }
 
+  private logAllElementTransformations(
+    parsedElements: ParsedElement[],
+    pptxElements: PPTXElement[]
+  ): void {
+    for (let i = 0; i < parsedElements.length; i++) {
+      this.logElementTransformation(parsedElements[i], pptxElements[i]);
+      
+      if (parsedElements[i].children && pptxElements[i].children) {
+        this.logAllElementTransformations(
+          parsedElements[i].children,
+          pptxElements[i].children!
+        );
+      }
+    }
+  }
+
   private countElements(elements: PPTXElement[]): number {
     let count = elements.length;
     for (const element of elements) {
@@ -118,11 +139,61 @@ export class ConversionPipeline {
     return count;
   }
 
-  private addLog(level: ConversionLog["level"], message: string): void {
+  private addLog(level: ConversionLog["level"], message: string, elementData?: ConversionLog["elementData"]): void {
     this.logs.push({
       level,
       message,
       timestamp: new Date(),
+      elementData,
+    });
+  }
+
+  private logElementTransformation(
+    parsed: ParsedElement,
+    pptx: PPTXElement
+  ): void {
+    const textPreview = parsed.textContent.substring(0, 50) + (parsed.textContent.length > 50 ? "..." : "");
+    const htmlPos = `x:${parsed.position.x.toFixed(2)}" y:${parsed.position.y.toFixed(2)}" w:${parsed.position.width.toFixed(2)}" h:${parsed.position.height.toFixed(2)}"`;
+    const pptxPos = `x:${pptx.position.x.toFixed(2)}" y:${pptx.position.y.toFixed(2)}" w:${pptx.position.width.toFixed(2)}" h:${pptx.position.height.toFixed(2)}"`;
+    
+    // Проверка корректности позиций
+    let status: "ok" | "warning" | "error" = "ok";
+    let issue: string | undefined;
+    
+    // Проверяем что позиция изменилась (если браузер был использован)
+    const positionsDiffer = 
+      Math.abs(parsed.position.x - pptx.position.x) > 0.01 ||
+      Math.abs(parsed.position.y - pptx.position.y) > 0.01;
+    
+    // Проверяем что текст не потерян
+    if (parsed.textContent && pptx.type !== "text" && !pptx.text) {
+      status = "warning";
+      issue = `Текст "${textPreview}" может быть потерян в ${pptx.type}`;
+    }
+    
+    // Проверяем слишком маленькие размеры
+    if (pptx.position.width < 0.1 || pptx.position.height < 0.1) {
+      status = "warning";
+      issue = "Элемент слишком маленький (< 0.1\")";
+    }
+    
+    // Проверяем элементы вне слайда
+    if (pptx.position.x < 0 || pptx.position.y < 0 || 
+        pptx.position.x + pptx.position.width > 10.5 || 
+        pptx.position.y + pptx.position.height > 8) {
+      status = "error";
+      issue = "Элемент за пределами слайда";
+    }
+    
+    this.addLog("element", `${parsed.tagName}#${parsed.id} → ${pptx.type}`, {
+      id: parsed.id,
+      tag: parsed.tagName,
+      text: textPreview,
+      htmlPosition: htmlPos,
+      pptxPosition: pptxPos,
+      pptxType: pptx.type,
+      status,
+      issue,
     });
   }
 
