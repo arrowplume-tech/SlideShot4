@@ -28,7 +28,11 @@ export class ConversionPipeline {
           }
 
           const browserElements = await this.browserCollector.collectLayout(html);
-          parsedElements = browserElements as unknown as ParsedElement[];
+          
+          // Filter out decorative wrappers BEFORE processing
+          const filteredElements = this.filterDecorativeElements(browserElements as unknown as ParsedElement[]);
+          parsedElements = filteredElements;
+          
           this.addLog("success", `✅ Playwright: получено ${parsedElements.length} элементов с точными позициями`);
           console.log("[ConversionPipeline] Playwright-based parsing complete:", parsedElements.length);
         } catch (browserError) {
@@ -56,6 +60,10 @@ export class ConversionPipeline {
       const elementCount = this.countElements(classifiedElements);
       this.addLog("success", `Classified ${elementCount} PowerPoint elements`);
       console.log("[ConversionPipeline] Classified element count:", elementCount);
+      
+      // Step 2.5: Validate slide bounds
+      console.log("[ConversionPipeline] Step 2.5: Validating slide bounds");
+      this.validateSlideBounds(parsedElements, options);
 
       // Step 3: Convert styles
       console.log("[ConversionPipeline] Step 3: Converting styles");
@@ -199,6 +207,113 @@ export class ConversionPipeline {
 
   getLogs(): ConversionLog[] {
     return this.logs;
+  }
+
+  private validateSlideBounds(elements: ParsedElement[], options: ConversionOptions): void {
+    const slideWidth = options.slideWidth || 10;
+    const slideHeight = options.slideHeight || 7.5;
+    let outsideCount = 0;
+    
+    const checkBounds = (el: ParsedElement) => {
+      const { x, y, width, height } = el.position;
+      
+      // Check if element is completely or partially outside slide
+      if (x < 0 || y < 0 || x + width > slideWidth || y + height > slideHeight) {
+        outsideCount++;
+        
+        const issue = [];
+        if (x < 0) issue.push(`x=${x.toFixed(2)}" < 0"`);
+        if (y < 0) issue.push(`y=${y.toFixed(2)}" < 0"`);
+        if (x + width > slideWidth) issue.push(`right edge at ${(x + width).toFixed(2)}" > ${slideWidth}"`);
+        if (y + height > slideHeight) issue.push(`bottom edge at ${(y + height).toFixed(2)}" > ${slideHeight}"`);
+        
+        console.warn(`  ⚠️ ${el.id} <${el.tagName}> outside bounds: ${issue.join(', ')}`);
+      }
+      
+      // Recursively check children
+      if (el.children) {
+        el.children.forEach(checkBounds);
+      }
+    };
+    
+    elements.forEach(checkBounds);
+    
+    if (outsideCount > 0) {
+      this.addLog("warning", `⚠️ ${outsideCount} elements are outside slide bounds (${slideWidth}" x ${slideHeight}")`);
+      console.warn(`[ConversionPipeline] ${outsideCount} elements outside slide bounds!`);
+    } else {
+      console.log(`[ConversionPipeline] All elements within slide bounds ✓`);
+    }
+  }
+
+  private filterDecorativeElements(elements: ParsedElement[]): ParsedElement[] {
+    console.log("[ConversionPipeline] Filtering decorative wrapper elements...");
+    
+    const slideWidth = 10;
+    const slideHeight = 7.5;
+    let filteredCount = 0;
+    
+    const processElement = (el: ParsedElement): ParsedElement[] => {
+      // Recursively process children first
+      let processedChildren: ParsedElement[] = [];
+      if (el.children && el.children.length > 0) {
+        processedChildren = el.children.flatMap(child => processElement(child));
+      }
+      
+      // Check if element should be filtered
+      const shouldFilter = this.shouldFilterElement(el, slideWidth, slideHeight);
+      
+      if (shouldFilter.filter) {
+        filteredCount++;
+        console.warn(`  → Filtered out ${el.id} <${el.tagName}> - ${shouldFilter.reason}`);
+        
+        // Return children instead of this element (flatten the tree)
+        if (processedChildren.length > 0) {
+          console.log(`  → Keeping ${processedChildren.length} children of filtered element`);
+        }
+        return processedChildren;
+      }
+      
+      // Keep this element but with processed children
+      return [{
+        ...el,
+        children: processedChildren
+      }];
+    };
+    
+    const filtered = elements.flatMap(el => processElement(el));
+    
+    console.log(`[ConversionPipeline] Filtered: ${filteredCount} decorative elements removed, ${filtered.length} top-level elements kept`);
+    
+    return filtered;
+  }
+  
+  private shouldFilterElement(el: ParsedElement, slideWidth: number, slideHeight: number): { filter: boolean; reason?: string } {
+    // Skip body and html tags - they are page wrappers, not content
+    if (el.tagName === 'body' || el.tagName === 'html') {
+      return { filter: true, reason: `<${el.tagName}> is page wrapper, not content` };
+    }
+    
+    // Filter out huge elements that exceed slide bounds significantly
+    const isHuge = el.position.width > slideWidth * 2 || el.position.height > slideHeight * 2;
+    if (isHuge) {
+      return { 
+        filter: true, 
+        reason: `HUGE element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") exceeds 2x slide size`
+      };
+    }
+    
+    // Filter out elements with enormous border-radius (likely decorative полуовалы)
+    const borderRadius = el.styles.borderRadius || "0px";
+    const radiusValue = parseFloat(borderRadius);
+    if (radiusValue > 500) {
+      return {
+        filter: true,
+        reason: `enormous border-radius (${borderRadius}), likely decorative`
+      };
+    }
+    
+    return { filter: false };
   }
 
   async cleanup(): Promise<void> {

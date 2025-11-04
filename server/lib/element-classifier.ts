@@ -18,12 +18,23 @@ export class ElementClassifier {
       children: element.children.length > 0 ? this.classify(element.children) : undefined,
     };
 
-    // Log classification decision
+    // Log classification decision with detailed info
     const textWarning = hasText && shapeType !== "text" ? " ⚠️ TEXT WILL BE LOST!" : "";
-    console.log(`[Classifier] ${element.id} <${element.tagName}> → ${shapeType}${textWarning}`, {
-      text: hasText ? `"${element.textContent}"` : "(no text)",
-      reason: this.getClassificationReason(element, shapeType),
-    });
+    const textPreview = hasText ? element.textContent.substring(0, 40) : "(no text)";
+    const reason = this.getClassificationReason(element, shapeType);
+    
+    console.log(`[Classifier] ${element.id} <${element.tagName}> → ${shapeType}${textWarning} { text: "${textPreview}", reason: '${reason}' }`);
+    
+    // Additional detailed logging for roundRect (potential полуовалы!)
+    if (shapeType === "roundRect") {
+      const pos = element.position;
+      const borderRadius = element.styles.borderRadius || "0px";
+      console.log(`  → roundRect details: position=(${pos.x.toFixed(2)}", ${pos.y.toFixed(2)}", ${pos.width.toFixed(2)}", ${pos.height.toFixed(2)}"), borderRadius=${borderRadius}, bg=${element.styles.backgroundColor}`);
+      
+      if (pos.width > 15 || pos.height > 10) {
+        console.warn(`  → ⚠️ HUGE roundRect! This might be a decorative wrapper that should be filtered out!`);
+      }
+    }
 
     return pptxElement;
   }

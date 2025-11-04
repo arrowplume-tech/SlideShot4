@@ -196,6 +196,9 @@ export class PlaywrightLayoutCollector {
       const layoutData = await page.evaluate(pageFunction) as BrowserElementData[];
 
       console.log(`[PlaywrightLayoutCollector] Collected layout data for ${this.countElements(layoutData)} elements`);
+      
+      // Log detailed information about each top-level element
+      this.logDetailedElementInfo(layoutData, 0);
 
       return layoutData;
 
@@ -212,6 +215,49 @@ export class PlaywrightLayoutCollector {
       }
     }
     return count;
+  }
+
+  private logDetailedElementInfo(elements: BrowserElementData[], depth: number): void {
+    const indent = "  ".repeat(depth);
+    
+    for (const el of elements) {
+      const pos = el.position;
+      const styles = el.styles;
+      
+      // Format position
+      const posStr = `x:${pos.x.toFixed(2)}" y:${pos.y.toFixed(2)}" w:${pos.width.toFixed(2)}" h:${pos.height.toFixed(2)}"`;
+      
+      // Extract key styles
+      const bgColor = styles.backgroundColor || 'transparent';
+      const borderRadius = styles.borderRadius || '0px';
+      const fontSize = styles.fontSize || 'inherit';
+      const textPreview = el.textContent.substring(0, 30) + (el.textContent.length > 30 ? '...' : '');
+      
+      console.log(`${indent}[Playwright] ${el.id} <${el.tagName}> {`);
+      console.log(`${indent}  text: "${textPreview || '(no text)'}"`);
+      console.log(`${indent}  position: ${posStr}`);
+      console.log(`${indent}  background: ${bgColor}`);
+      console.log(`${indent}  borderRadius: ${borderRadius}`);
+      console.log(`${indent}  fontSize: ${fontSize}`);
+      
+      // Warning for huge elements
+      if (pos.width > 15 || pos.height > 10) {
+        console.warn(`${indent}  ⚠️ HUGE ELEMENT! Exceeds slide bounds (10" x 7.5")`);
+      }
+      
+      // Warning for large border-radius
+      const radiusValue = parseFloat(borderRadius);
+      if (radiusValue > 100) {
+        console.warn(`${indent}  ⚠️ LARGE BORDER-RADIUS: ${borderRadius} - may create unwanted roundRect`);
+      }
+      
+      console.log(`${indent}}`);
+      
+      // Recursively log children
+      if (el.children && el.children.length > 0) {
+        this.logDetailedElementInfo(el.children, depth + 1);
+      }
+    }
   }
 
   async close(): Promise<void> {

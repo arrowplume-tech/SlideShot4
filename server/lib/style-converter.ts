@@ -4,16 +4,21 @@ export class StyleConverter {
   convertStyles(parsedElement: ParsedElement, pptxElement: PPTXElement): void {
     const styles: PPTXStyles = {};
 
+    console.log(`[StyleConverter] Converting styles for ${parsedElement.id} <${parsedElement.tagName}>`);
+
     // Background color / fill (including gradients)
     if (parsedElement.styles.backgroundColor) {
       // Check if it's a gradient
       if (this.isGradient(parsedElement.styles.backgroundColor)) {
-        console.log(`[StyleConverter] Gradient detected: ${parsedElement.styles.backgroundColor}`);
+        const gradientStr = parsedElement.styles.backgroundColor.substring(0, 80);
+        console.log(`  → Gradient detected: ${gradientStr}...`);
         styles.fill = this.convertGradient(parsedElement.styles.backgroundColor);
+        console.log(`  → Converted to PowerPoint gradient: ${styles.fill}`);
       } else {
         const bgColor = this.convertColor(parsedElement.styles.backgroundColor);
         if (bgColor && bgColor !== "transparent") {
           styles.fill = bgColor;
+          console.log(`  → Background color: ${parsedElement.styles.backgroundColor} → #${bgColor}`);
         }
       }
     }
@@ -25,24 +30,33 @@ export class StyleConverter {
 
     // Font properties
     if (parsedElement.styles.fontSize) {
-      styles.fontSize = this.convertFontSize(parsedElement.styles.fontSize);
+      const originalSize = parsedElement.styles.fontSize;
+      styles.fontSize = this.convertFontSize(originalSize);
+      console.log(`  → Font size: ${originalSize} → ${styles.fontSize}pt`);
     }
 
     if (parsedElement.styles.fontFamily) {
-      styles.fontFace = this.convertFontFamily(parsedElement.styles.fontFamily);
+      const originalFont = parsedElement.styles.fontFamily;
+      styles.fontFace = this.convertFontFamily(originalFont);
+      console.log(`  → Font family: ${originalFont} → ${styles.fontFace}`);
     }
 
     if (parsedElement.styles.fontWeight) {
       styles.bold = this.isBold(parsedElement.styles.fontWeight);
+      if (styles.bold) {
+        console.log(`  → Font weight: ${parsedElement.styles.fontWeight} → bold`);
+      }
     }
 
     if (parsedElement.styles.fontStyle === "italic") {
       styles.italic = true;
+      console.log(`  → Font style: italic`);
     }
 
     // Text alignment
     if (parsedElement.styles.textAlign) {
       styles.align = this.convertTextAlign(parsedElement.styles.textAlign);
+      console.log(`  → Text align: ${parsedElement.styles.textAlign} → ${styles.align}`);
     }
 
     // Borders
@@ -53,6 +67,7 @@ export class StyleConverter {
         width: this.convertBorderWidth(parsedElement.styles.borderWidth),
         dashType: this.convertBorderStyle(parsedElement.styles.borderStyle),
       };
+      console.log(`  → Border: ${parsedElement.styles.borderWidth} ${parsedElement.styles.borderStyle} ${borderColor} → ${styles.line.width}pt ${styles.line.dashType} #${styles.line.color}`);
     }
 
     // Opacity
@@ -60,6 +75,7 @@ export class StyleConverter {
       const opacity = parseFloat(parsedElement.styles.opacity);
       if (opacity < 1) {
         styles.fillOpacity = opacity;
+        console.log(`  → Opacity: ${opacity}`);
       }
     }
 

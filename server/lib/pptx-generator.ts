@@ -71,9 +71,28 @@ export class PPTXGenerator {
       };
     }
 
-    // Log what we're adding
-    const textInfo = text ? `with text: "${text}"` : "no text";
+    // Log what we're adding with detailed style information
+    const textInfo = text ? `with text: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"` : "no text";
+    const fillInfo = styles.fill ? `fill=${styles.fill}` : 'no fill';
+    const lineInfo = styles.line ? `line=${styles.line.color}` : 'no line';
+    
     console.log(`[PPTXGenerator] Adding ${type} at (${position.x.toFixed(2)}, ${position.y.toFixed(2)}) ${position.width.toFixed(2)}x${position.height.toFixed(2)} ${textInfo}`);
+    console.log(`  → Styles: ${fillInfo}, ${lineInfo}`);
+    
+    // Warning for elements outside slide bounds
+    const slideWidth = this.options.slideWidth || 10;
+    const slideHeight = this.options.slideHeight || 7.5;
+    
+    if (position.x < 0 || position.y < 0 || 
+        position.x + position.width > slideWidth || 
+        position.y + position.height > slideHeight) {
+      console.warn(`  → ⚠️ Element outside slide bounds! Slide is ${slideWidth}" x ${slideHeight}"`);
+    }
+    
+    // Warning for huge elements
+    if (position.width > slideWidth * 1.5 || position.height > slideHeight * 1.5) {
+      console.warn(`  → ⚠️ HUGE element! Might be a decorative wrapper.`);
+    }
 
     // Check if shape has text content - this is a problem!
     if (text && text.trim().length > 0 && type !== "text") {
