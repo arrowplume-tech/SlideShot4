@@ -87,6 +87,26 @@ Professional Linear/VS Code-inspired aesthetic:
 
 ## Recent Changes (November 2025)
 
+### Comprehensive Logging & Element Filtering (November 4, 2025 - Latest)
+- ✅ **Detailed Logging Throughout Pipeline**:
+  - PlaywrightLayoutCollector logs all element positions, dimensions, colors, borders
+  - Classifier logs shape detection reasoning (circle/rect/roundRect/text)
+  - StyleConverter logs CSS-to-PowerPoint conversions
+  - PPTXGenerator logs exact coordinates, dimensions, and text warnings
+- ✅ **Intelligent Element Filtering**:
+  - Automatically removes decorative wrappers (body, html tags)
+  - Filters out huge elements exceeding 2x slide dimensions
+  - Removes elements with enormous border-radius (>500px, likely decorative)
+  - Uses recursive `flatMap` to preserve children of filtered elements
+- ✅ **Slide Bounds Validation**:
+  - Checks all elements against 10" x 7.5" slide boundaries
+  - Warns which edges extend beyond slide (left/right/top/bottom)
+  - Helps debug positioning issues
+- ✅ **Text Loss Warnings**:
+  - Alerts when shapes contain text that will be lost
+  - Automatically adds text overlays for shape+text combinations
+  - Prevents silent content loss during conversion
+
 ### Migration to Playwright (November 4, 2025)
 - ✅ **Migrated from Puppeteer to Playwright**: More stable and modern browser automation
 - ✅ **Better Cloud Environment Support**: Playwright Firefox works perfectly in Replit environment
