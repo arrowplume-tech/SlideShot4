@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Page } from "puppeteer";
+import { firefox, Browser, Page } from "playwright";
 import type { ParsedElement, ComputedStyles, ElementPosition } from "@shared/conversion-types";
 
 export interface BrowserElementData {
@@ -10,21 +10,14 @@ export interface BrowserElementData {
   children: BrowserElementData[];
 }
 
-export class BrowserLayoutCollector {
+export class PlaywrightLayoutCollector {
   private browser: Browser | null = null;
 
   async initialize(): Promise<void> {
     try {
-      console.log("[BrowserLayoutCollector] Launching headless browser...");
+      console.log("[PlaywrightLayoutCollector] Launching Firefox headless browser...");
       
-      // Use system Chromium on NixOS/Replit (find chromium in PATH or /nix/store)
-      const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH 
-        || '/nix/store/qa9cnw4v5xkxyip6mb9kxqfq1z4x2dx1-chromium-138.0.7204.100/bin/chromium';
-      
-      console.log("[BrowserLayoutCollector] Using Chromium at:", executablePath);
-      
-      this.browser = await puppeteer.launch({
-        executablePath,
+      this.browser = await firefox.launch({
         headless: true,
         args: [
           '--no-sandbox',
@@ -32,16 +25,15 @@ export class BrowserLayoutCollector {
           '--disable-dev-shm-usage',
           '--disable-accelerated-2d-canvas',
           '--no-first-run',
-          '--no-zygote',
           '--disable-gpu'
         ],
       });
-      console.log("[BrowserLayoutCollector] Browser launched successfully");
+      console.log("[PlaywrightLayoutCollector] Browser launched successfully");
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : '';
-      console.error("[BrowserLayoutCollector] Failed to launch browser:", errorMessage);
-      console.error("[BrowserLayoutCollector] Error stack:", errorStack);
+      console.error("[PlaywrightLayoutCollector] Failed to launch browser:", errorMessage);
+      console.error("[PlaywrightLayoutCollector] Error stack:", errorStack);
       throw new Error(`Не удалось запустить браузер для анализа HTML. Ошибка: ${errorMessage}`);
     }
   }
@@ -55,13 +47,12 @@ export class BrowserLayoutCollector {
     
     try {
       // Set viewport to match PowerPoint slide dimensions (10 x 7.5 inches at 96 DPI)
-      await page.setViewport({
+      await page.setViewportSize({
         width: 960,  // 10 inches * 96 DPI
         height: 720, // 7.5 inches * 96 DPI
-        deviceScaleFactor: 1,
       });
 
-      console.log("[BrowserLayoutCollector] Setting HTML content...");
+      console.log("[PlaywrightLayoutCollector] Setting HTML content...");
       
       // Wrap HTML in a full document if it's not already
       const fullHtml = html.includes("<!DOCTYPE") ? html : `
@@ -83,20 +74,12 @@ export class BrowserLayoutCollector {
         </html>
       `;
 
-      await page.setContent(fullHtml, { waitUntil: "networkidle0" });
+      await page.setContent(fullHtml, { waitUntil: "networkidle" });
 
-      console.log("[BrowserLayoutCollector] Extracting layout data from DOM...");
-
-      // First, test if page.evaluate works at all
-      try {
-        const simpleTest = await page.evaluate('1 + 1');
-        console.log("[BrowserLayoutCollector] Simple test result:", simpleTest);
-      } catch (err) {
-        console.error("[BrowserLayoutCollector] Simple test failed:", err);
-      }
+      console.log("[PlaywrightLayoutCollector] Extracting layout data from DOM...");
 
       // Execute script in browser context to collect all element data  
-      // Using string-based function to avoid TSX compilation issues
+      // Using string-based function to ensure browser compatibility
       const pageFunction = `
       (function() {
         var elementIdCounter = 0;
@@ -208,7 +191,7 @@ export class BrowserLayoutCollector {
       
       const layoutData = await page.evaluate(pageFunction) as BrowserElementData[];
 
-      console.log(`[BrowserLayoutCollector] Collected layout data for ${this.countElements(layoutData)} elements`);
+      console.log(`[PlaywrightLayoutCollector] Collected layout data for ${this.countElements(layoutData)} elements`);
 
       return layoutData;
 
@@ -229,7 +212,7 @@ export class BrowserLayoutCollector {
 
   async close(): Promise<void> {
     if (this.browser) {
-      console.log("[BrowserLayoutCollector] Closing browser...");
+      console.log("[PlaywrightLayoutCollector] Closing browser...");
       await this.browser.close();
       this.browser = null;
     }

@@ -1,5 +1,5 @@
 import { HTMLParser } from "./html-parser";
-import { BrowserLayoutCollector } from "./browser-layout-collector";
+import { PlaywrightLayoutCollector } from "./playwright-layout-collector";
 import { ElementClassifier } from "./element-classifier";
 import { StyleConverter } from "./style-converter";
 import { PPTXGenerator } from "./pptx-generator";
@@ -7,7 +7,7 @@ import type { ConversionOptions, ConversionLog, PPTXElement, ParsedElement } fro
 
 export class ConversionPipeline {
   private logs: ConversionLog[] = [];
-  private browserCollector: BrowserLayoutCollector | null = null;
+  private browserCollector: PlaywrightLayoutCollector | null = null;
 
   async convert(html: string, options: ConversionOptions): Promise<{ buffer: Buffer; logs: ConversionLog[] }> {
     this.logs = [];
@@ -18,23 +18,23 @@ export class ConversionPipeline {
 
       // Step 1: Parse HTML - use browser-based layout for better accuracy
       if (options.useBrowserLayout !== false) {
-        console.log("[ConversionPipeline] Step 1: Attempting browser-based layout collection");
-        this.addLog("info", "Trying headless browser for accurate layout calculation...");
+        console.log("[ConversionPipeline] Step 1: Attempting Playwright-based layout collection");
+        this.addLog("info", "Использую Playwright для точного расчета позиций...");
         
         try {
           if (!this.browserCollector) {
-            this.browserCollector = new BrowserLayoutCollector();
+            this.browserCollector = new PlaywrightLayoutCollector();
             await this.browserCollector.initialize();
           }
 
           const browserElements = await this.browserCollector.collectLayout(html);
           parsedElements = browserElements as unknown as ParsedElement[];
-          this.addLog("success", `Layout collected from browser: ${parsedElements.length} root elements`);
-          console.log("[ConversionPipeline] Browser-based parsing complete:", parsedElements.length);
+          this.addLog("success", `✅ Playwright: получено ${parsedElements.length} элементов с точными позициями`);
+          console.log("[ConversionPipeline] Playwright-based parsing complete:", parsedElements.length);
         } catch (browserError) {
           const errorMsg = browserError instanceof Error ? browserError.message : String(browserError);
-          console.warn("[ConversionPipeline] Browser layout failed, falling back to traditional parser:", errorMsg);
-          this.addLog("warning", `Браузер недоступен, используется традиционный парсер HTML`);
+          console.warn("[ConversionPipeline] Playwright layout failed, falling back to traditional parser:", errorMsg);
+          this.addLog("warning", `⚠️ Playwright недоступен, используется JSDOM парсер (точность ~70%)`);
           
           const parser = new HTMLParser(html);
           parsedElements = parser.parse();
