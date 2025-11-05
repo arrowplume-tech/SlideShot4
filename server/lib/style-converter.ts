@@ -59,15 +59,18 @@ export class StyleConverter {
       console.log(`  → Text align: ${parsedElement.styles.textAlign} → ${styles.align}`);
     }
 
-    // Borders
-    if (parsedElement.styles.borderWidth && parsedElement.styles.borderStyle && parsedElement.styles.borderStyle !== "none") {
-      const borderColor = parsedElement.styles.borderColor || "#000000";
+    // Borders - check if all 4 sides have the same border
+    const hasBorder = this.hasUniformBorder(parsedElement.styles);
+    if (hasBorder) {
+      const borderColor = parsedElement.styles.borderColor || parsedElement.styles.borderTopColor || "#000000";
       styles.line = {
-        color: this.convertColor(borderColor) || "#000000",
-        width: this.convertBorderWidth(parsedElement.styles.borderWidth),
-        dashType: this.convertBorderStyle(parsedElement.styles.borderStyle),
+        color: this.convertColor(borderColor) || "000000",
+        width: this.convertBorderWidth(parsedElement.styles.borderTopWidth || parsedElement.styles.borderWidth || "1px"),
+        dashType: this.convertBorderStyle(parsedElement.styles.borderTopStyle || parsedElement.styles.borderStyle || "solid"),
       };
       console.log(`  → Border: ${parsedElement.styles.borderWidth} ${parsedElement.styles.borderStyle} ${borderColor} → ${styles.line.width}pt ${styles.line.dashType} #${styles.line.color}`);
+    } else {
+      console.log(`  → Skipping non-uniform borders (e.g., border-bottom only)`);
     }
 
     // Opacity
@@ -162,6 +165,50 @@ export class StyleConverter {
     if (style === "dashed") return "dash";
     if (style === "dotted") return "dot";
     return "solid";
+  }
+
+  private hasUniformBorder(styles: any): boolean {
+    const top = {
+      width: styles.borderTopWidth,
+      style: styles.borderTopStyle,
+      color: styles.borderTopColor,
+    };
+    const right = {
+      width: styles.borderRightWidth,
+      style: styles.borderRightStyle,
+      color: styles.borderRightColor,
+    };
+    const bottom = {
+      width: styles.borderBottomWidth,
+      style: styles.borderBottomStyle,
+      color: styles.borderBottomColor,
+    };
+    const left = {
+      width: styles.borderLeftWidth,
+      style: styles.borderLeftStyle,
+      color: styles.borderLeftColor,
+    };
+
+    const hasTopBorder = top.width && parseFloat(top.width) > 0 && top.style && top.style !== "none";
+    const hasRightBorder = right.width && parseFloat(right.width) > 0 && right.style && right.style !== "none";
+    const hasBottomBorder = bottom.width && parseFloat(bottom.width) > 0 && bottom.style && bottom.style !== "none";
+    const hasLeftBorder = left.width && parseFloat(left.width) > 0 && left.style && left.style !== "none";
+
+    if (!hasTopBorder && !hasRightBorder && !hasBottomBorder && !hasLeftBorder) {
+      return false;
+    }
+
+    const allSidesHaveBorder = hasTopBorder && hasRightBorder && hasBottomBorder && hasLeftBorder;
+    
+    if (!allSidesHaveBorder) {
+      return false;
+    }
+
+    const sameWidth = top.width === right.width && right.width === bottom.width && bottom.width === left.width;
+    const sameStyle = top.style === right.style && right.style === bottom.style && bottom.style === left.style;
+    const sameColor = top.color === right.color && right.color === bottom.color && bottom.color === left.color;
+
+    return sameWidth && sameStyle && sameColor;
   }
 
   private isGradient(cssValue: string): boolean {

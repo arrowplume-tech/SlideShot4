@@ -294,18 +294,31 @@ export class ConversionPipeline {
       return { filter: true, reason: `<${el.tagName}> is page wrapper, not content` };
     }
     
-    // Filter out huge elements that exceed slide bounds significantly
-    const isHuge = el.position.width > slideWidth * 2 || el.position.height > slideHeight * 2;
+    // Filter out huge elements that exceed slide bounds significantly (even by 1.5x)
+    const isHuge = el.position.width > slideWidth * 1.5 || el.position.height > slideHeight * 1.5;
     if (isHuge) {
       return { 
         filter: true, 
-        reason: `HUGE element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") exceeds 2x slide size`
+        reason: `HUGE element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") exceeds 1.5x slide size`
       };
     }
     
-    // Filter out elements with enormous border-radius (likely decorative полуовалы)
+    // Filter out elements with large border-radius that also have gray backgrounds (decorative полуовалы)
     const borderRadius = el.styles.borderRadius || "0px";
     const radiusValue = parseFloat(borderRadius);
+    const bgColor = el.styles.backgroundColor || "";
+    const isGrayish = bgColor.includes("rgb(245") || bgColor.includes("rgb(240") || 
+                      bgColor.includes("rgb(250") || bgColor.includes("#f5f5f5") || 
+                      bgColor.includes("#f0f0f0");
+    
+    if (radiusValue > 100 && isGrayish && (el.position.width > slideWidth * 0.8 || el.position.height > slideHeight * 0.8)) {
+      return {
+        filter: true,
+        reason: `decorative wrapper: large border-radius (${borderRadius}) + gray background + large size`
+      };
+    }
+    
+    // Filter out any element with extremely large border-radius
     if (radiusValue > 500) {
       return {
         filter: true,
