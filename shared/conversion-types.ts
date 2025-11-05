@@ -116,8 +116,9 @@ export interface SingleSidedBorder {
 }
 
 export interface PPTXStyles {
-  fill?: string;
+  fill?: string | any; // Can be color string or gradient object
   fillOpacity?: number;
+  borderRadius?: number; // Border radius in inches (for roundRect)
   line?: {
     color: string;
     width: number;

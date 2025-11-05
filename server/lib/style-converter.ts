@@ -80,6 +80,17 @@ export class StyleConverter {
       }
     }
 
+    // Border radius (for roundRect)
+    if (parsedElement.styles.borderRadius) {
+      const borderRadius = parsedElement.styles.borderRadius;
+      const radiusValue = parseFloat(borderRadius);
+      if (!isNaN(radiusValue) && radiusValue > 0) {
+        // Convert px to inches (96 DPI)
+        styles.borderRadius = radiusValue / 96;
+        console.log(`  → Border radius: ${borderRadius} → ${styles.borderRadius.toFixed(3)}"`);
+      }
+    }
+
     // Opacity
     if (parsedElement.styles.opacity) {
       const opacity = parseFloat(parsedElement.styles.opacity);
@@ -323,13 +334,15 @@ export class StyleConverter {
 
   private extractGradientColors(gradient: string): string[] {
     // Extract colors from gradient string
+    // Handles: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
     // Matches: rgb(r,g,b), rgba(r,g,b,a), #hex, named colors
-    const colorRegex = /(rgba?\([^)]+\)|#[a-fA-F0-9]{3,8}|\b(?:red|blue|green|yellow|white|black|purple|orange|pink|gray|grey)\b)(?:\s+\d+%)?/gi;
+    const colorRegex = /(rgba?\([^)]+\)|#[a-fA-F0-9]{3,8}|\b(?:red|blue|green|yellow|white|black|purple|orange|pink|gray|grey|navy|maroon|olive|teal|aqua|fuchsia|lime|silver)\b)/gi;
     const matches = gradient.match(colorRegex) || [];
     
-    // Extract just the color part, removing percentage
+    // Extract just the color part, removing percentage and whitespace
     return matches.map(match => {
-      const colorOnly = match.split(/\s+/)[0];
+      // Remove any trailing percentage or whitespace
+      const colorOnly = match.trim();
       return colorOnly;
     }).filter(Boolean);
   }

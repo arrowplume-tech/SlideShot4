@@ -122,6 +122,36 @@ export class PlaywrightLayoutCollector {
 
           var pxToInches = function(px) { return px / 96; };
 
+          // Try to get background from inline style first (for gradients), then computed style
+          var finalBackground = '';
+          
+          // First check inline style (most reliable for gradients)
+          var inlineBackground = element.style.background || element.style.backgroundImage || element.style.backgroundColor;
+          if (inlineBackground && inlineBackground !== 'none' && inlineBackground !== 'transparent' && inlineBackground !== 'rgba(0, 0, 0, 0)') {
+            finalBackground = inlineBackground;
+          } else {
+            // Fallback to computed style
+            var bgImage = style.backgroundImage || style.getPropertyValue('background-image');
+            var bgColor = style.backgroundColor;
+            
+            if (bgImage && bgImage !== 'none' && bgImage.includes('gradient')) {
+              finalBackground = bgImage;
+            } else if (bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)') {
+              finalBackground = bgColor;
+            } else {
+              // Try to get background shorthand from computed style
+              var backgroundShorthand = style.getPropertyValue('background');
+              if (backgroundShorthand && backgroundShorthand !== 'none' && backgroundShorthand.includes('gradient')) {
+                finalBackground = backgroundShorthand;
+              }
+            }
+          }
+          
+          // Log gradient detection for debugging
+          if (finalBackground && finalBackground.includes('gradient')) {
+            console.log(`[Playwright] Gradient detected for ${element.tagName}: ${finalBackground.substring(0, 60)}...`);
+          }
+
           var data = {
             id: "el-" + (elementIdCounter++),
             tagName: element.tagName.toLowerCase(),
@@ -133,7 +163,7 @@ export class PlaywrightLayoutCollector {
               height: pxToInches(rect.height),
             },
             styles: {
-              backgroundColor: style.backgroundColor,
+              backgroundColor: finalBackground || style.backgroundColor,
               color: style.color,
               fontSize: style.fontSize,
               fontFamily: style.fontFamily,

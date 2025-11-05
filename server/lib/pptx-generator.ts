@@ -52,13 +52,42 @@ export class PPTXGenerator {
       y: position.y,
       w: position.width,
       h: position.height,
+      styles: styles, // Pass styles for borderRadius and other properties
     };
 
-    // Add fill color
+    // Add fill color or gradient
     if (styles.fill) {
-      commonProps.fill = { color: styles.fill };
+      // Check if fill is a gradient object
+      if (typeof styles.fill === 'object' && styles.fill.type === 'gradient') {
+        // PptxGenJS gradient support
+        try {
+          commonProps.fill = {
+            type: 'solid',
+            color: styles.fill.colors && styles.fill.colors.length > 0 
+              ? styles.fill.colors[0].color 
+              : '667EEA', // Fallback to first color or default
+          };
+          console.log(`[PPTXGenerator] Using gradient first color: #${commonProps.fill.color}`);
+          
+          // TODO: Full gradient support in PptxGenJS requires more complex setup
+          // For now, use first color as solid fill
+        } catch (error) {
+          console.warn(`[PPTXGenerator] Gradient conversion failed, using first color:`, error);
+          commonProps.fill = { 
+            color: styles.fill.colors && styles.fill.colors.length > 0 
+              ? styles.fill.colors[0].color 
+              : '667EEA' 
+          };
+        }
+      } else {
+        // Regular color fill
+        commonProps.fill = { color: styles.fill };
+      }
+      
       if (styles.fillOpacity !== undefined) {
-        commonProps.fill.transparency = Math.round((1 - styles.fillOpacity) * 100);
+        if (!commonProps.fill.transparency) {
+          commonProps.fill.transparency = Math.round((1 - styles.fillOpacity) * 100);
+        }
       }
     }
 
@@ -189,6 +218,10 @@ export class PPTXGenerator {
   }
 
   private addRoundedRectangle(slide: any, props: any): void {
+    // Add border radius if specified (in inches)
+    if (props.styles?.borderRadius) {
+      props.rectRadius = props.styles.borderRadius;
+    }
     slide.addShape(this.pptx.ShapeType.roundRect, props);
   }
 
