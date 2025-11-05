@@ -1,0 +1,1159 @@
+
+> rest-express@1.0.0 dev
+8:49:14 AM [express] serving on port 5000s
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+[API] Starting conversion with options: {
+  slideWidth: 10,
+  slideHeight: 7.5,
+  preserveImages: true,
+  optimizeShapes: true,
+  mergeTextBoxes: false,
+  useBrowserLayout: true
+}
+[ConversionPipeline] Step 1: Attempting Playwright-based layout collection
+[PlaywrightLayoutCollector] Launching Firefox headless browser...
+[PlaywrightLayoutCollector] Browser launched successfully
+[PlaywrightLayoutCollector] Setting HTML content...
+[PlaywrightLayoutCollector] Extracting layout data from DOM...
+[PlaywrightLayoutCollector] Collected layout data for 4 elements
+[PlaywrightLayoutCollector] Coordinates normalized to start from (0, 0)
+[Playwright] el-1 <div> {
+  text: "(no text)"
+  position: x:0.00" y:0.00" w:10.00" h:3.65"
+  background: rgb(26, 26, 46)
+  borderRadius: 0px
+  fontSize: 16px
+}
+  [Playwright] el-2 <h1> {
+    text: "Welcome to SlideShot"
+    position: x:0.42" y:0.83" w:9.17" h:0.60"
+    background: rgba(0, 0, 0, 0)
+    borderRadius: 0px
+    fontSize: 48px
+  }
+  [Playwright] el-3 <p> {
+    text: "Convert HTML to PowerPoint wit..."
+    position: x:0.42" y:1.69" w:9.17" h:0.25"
+    background: rgba(0, 0, 0, 0)
+    borderRadius: 0px
+    fontSize: 20px
+  }
+  [Playwright] el-4 <div> {
+    text: "Get Started"
+    position: x:4.13" y:2.27" w:1.74" h:0.54"
+    background: rgb(102, 126, 234)
+    borderRadius: 8px
+    fontSize: 16px
+  }
+[ConversionPipeline] Filtering decorative wrapper elements...
+[ConversionPipeline] Filtered: 0 decorative elements removed, 1 top-level elements kept
+[ConversionPipeline] Playwright-based parsing complete: 1
+[ConversionPipeline] Step 2: Classifying elements
+[Classifier] el-2 <h1> → text { text: "Welcome to SlideShot", reason: 'text tag or content-only' }
+[Classifier] el-3 <p> → text { text: "Convert HTML to PowerPoint with native e", reason: 'text tag or content-only' }
+[Classifier] el-4 <div> → roundRect ⚠️ TEXT WILL BE LOST! { text: "Get Started", reason: 'border-radius: 8px' }
+  → roundRect details: position=(4.13", 2.27", 1.74", 0.54"), borderRadius=8px, bg=rgb(102, 126, 234)
+[Classifier] el-1 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[ConversionPipeline] Classified element count: 4
+[ConversionPipeline] Step 2.5: Validating slide bounds
+[ConversionPipeline] All elements within slide bounds ✓
+[ConversionPipeline] Step 3: Converting styles
+[StyleConverter] Converting styles for el-1 <div>
+  → Background color: rgb(26, 26, 46) → #1A1A2E
+  → Font size: 16px → 12pt
+  → Font family: serif → serif
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-2 <h1>
+  → Font size: 48px → 36pt
+  → Font family: serif → serif
+  → Font weight: 700 → bold
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-3 <p>
+  → Font size: 20px → 15pt
+  → Font family: serif → serif
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+  → Opacity: 0.8
+[StyleConverter] Converting styles for el-4 <div>
+  → Background color: rgb(102, 126, 234) → #667EEA
+  → Font size: 16px → 12pt
+  → Font family: serif → serif
+  → Font weight: 700 → bold
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[ConversionPipeline] Styles converted successfully
+[ConversionPipeline] Step 3.5: Logging element transformations
+[ConversionPipeline] Step 4: Generating PPTX
+[PPTXGenerator] Adding 1 elements to slide
+[PPTXGenerator] Adding rect at (0.00, 0.00) 10.00x3.65 no text
+  → Styles: fill=1A1A2E, no line
+[PPTXGenerator] Adding text at (0.42, 0.83) 9.17x0.60 with text: "Welcome to SlideShot"
+  → Styles: no fill, no line
+[PPTXGenerator] Adding text at (0.42, 1.69) 9.17x0.25 with text: "Convert HTML to PowerPoint wit..."
+  → Styles: no fill, no line
+[PPTXGenerator] Adding roundRect at (4.13, 2.27) 1.74x0.54 with text: "Get Started"
+  → Styles: fill=667EEA, no line
+⚠️  [PPTXGenerator] Shape type "roundRect" has text "Get Started" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Get Started"
+[ConversionPipeline] PPTX structure generated
+[ConversionPipeline] Converting to buffer...
+[ConversionPipeline] Buffer created, size: 47221
+[API] Conversion completed successfully, buffer size: 47221
+[PlaywrightLayoutCollector] Closing browser...
+9:07:44 AM [express] POST /api/convert 200 in 3011ms :: {"success":true,"logs":[{"level":"info","mes…
+[API] Pipeline cleanup completed
+[API] Starting conversion with options: {
+  slideWidth: 10,
+  slideHeight: 7.5,
+  preserveImages: true,
+  optimizeShapes: true,
+  mergeTextBoxes: false,
+  useBrowserLayout: true
+}
+[ConversionPipeline] Step 1: Attempting Playwright-based layout collection
+[PlaywrightLayoutCollector] Launching Firefox headless browser...
+[PlaywrightLayoutCollector] Browser launched successfully
+[PlaywrightLayoutCollector] Setting HTML content...
+[PlaywrightLayoutCollector] Extracting layout data from DOM...
+[PlaywrightLayoutCollector] Collected layout data for 59 elements
+[PlaywrightLayoutCollector] Coordinates normalized to start from (0, 0)
+[Playwright] el-1 <div> {
+  text: "(no text)"
+  position: x:0.00" y:0.00" w:10.00" h:10.57"
+  background: rgb(255, 255, 255)
+  borderRadius: 10px
+  fontSize: 16px
+  ⚠️ HUGE ELEMENT! Exceeds slide bounds (10" x 7.5")
+}
+  [Playwright] el-2 <div> {
+    text: "(no text)"
+    position: x:0.42" y:0.42" w:9.17" h:0.80"
+    background: rgba(0, 0, 0, 0)
+    borderRadius: 0px
+    fontSize: 16px
+  }
+    [Playwright] el-3 <h1> {
+      text: "Ключевой результат: Трансформа..."
+      position: x:0.42" y:0.42" w:9.17" h:0.35"
+      background: rgba(0, 0, 0, 0)
+      borderRadius: 0px
+      fontSize: 28px
+    }
+    [Playwright] el-4 <p> {
+      text: "Переход от реактивного управле..."
+      position: x:0.42" y:0.82" w:9.17" h:0.40"
+      background: rgba(0, 0, 0, 0)
+      borderRadius: 0px
+      fontSize: 16px
+    }
+  [Playwright] el-5 <div> {
+    text: "(no text)"
+    position: x:0.42" y:1.64" w:9.17" h:8.51"
+    background: rgba(0, 0, 0, 0)
+    borderRadius: 0px
+    fontSize: 16px
+  }
+    [Playwright] el-6 <div> {
+      text: "(no text)"
+      position: x:0.42" y:1.64" w:4.38" h:8.51"
+      background: rgba(0, 0, 0, 0)
+      borderRadius: 0px
+      fontSize: 16px
+    }
+      [Playwright] el-7 <h2> {
+        text: "КАК БЫЛО"
+        position: x:0.42" y:1.83" w:4.38" h:0.42"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 22px
+      }
+      [Playwright] el-8 <div> {
+        text: "(no text)"
+        position: x:0.42" y:2.45" w:4.38" h:0.91"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-9 <div> {
+          text: "📄"
+          position: x:0.42" y:2.45" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-10 <div> {
+          text: "(no text)"
+          position: x:1.04" y:2.45" w:3.75" h:0.91"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-11 <div> {
+            text: "Ручной сбор и анализ данных"
+            position: x:1.04" y:2.45" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-12 <div> {
+            text: "Данные по энергопотреблению и ..."
+            position: x:1.04" y:2.70" w:3.75" h:0.66"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+      [Playwright] el-13 <div> {
+        text: "(no text)"
+        position: x:0.42" y:3.62" w:4.38" h:1.13"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-14 <div> {
+          text: "⚙️"
+          position: x:0.42" y:3.62" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-15 <div> {
+          text: "(no text)"
+          position: x:1.04" y:3.62" w:3.75" h:1.13"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-16 <div> {
+            text: "Реактивное управление надежнос..."
+            position: x:1.04" y:3.62" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-17 <div> {
+            text: "Ремонты проводились по жестком..."
+            position: x:1.04" y:3.87" w:3.75" h:0.88"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+      [Playwright] el-18 <div> {
+        text: "(no text)"
+        position: x:0.42" y:5.00" w:4.38" h:0.91"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-19 <div> {
+          text: "📞"
+          position: x:0.42" y:5.00" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-20 <div> {
+          text: "(no text)"
+          position: x:1.04" y:5.00" w:3.75" h:0.91"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-21 <div> {
+            text: ""Слепое" оперативное управлени..."
+            position: x:1.04" y:5.00" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-22 <div> {
+            text: "Диспетчер не видел полную карт..."
+            position: x:1.04" y:5.25" w:3.75" h:0.66"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+      [Playwright] el-23 <div> {
+        text: "(no text)"
+        position: x:0.42" y:6.17" w:4.38" h:0.91"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-24 <div> {
+          text: "🚶"
+          position: x:0.42" y:6.17" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-25 <div> {
+          text: "(no text)"
+          position: x:1.04" y:6.17" w:3.75" h:0.91"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-26 <div> {
+            text: "Бумажная работа "в поле""
+            position: x:1.04" y:6.17" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-27 <div> {
+            text: "Электромонтеры заполняли бумаж..."
+            position: x:1.04" y:6.42" w:3.75" h:0.66"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+      [Playwright] el-28 <div> {
+        text: "(no text)"
+        position: x:0.42" y:9.05" w:4.38" h:1.09"
+        background: rgb(255, 235, 238)
+        borderRadius: 8px
+        fontSize: 16px
+      }
+        [Playwright] el-29 <div> {
+          text: "Итог:"
+          position: x:0.63" y:9.21" w:4.01" h:0.20"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+        [Playwright] el-30 <div> {
+          text: "Высокие трудозатраты, длительн..."
+          position: x:0.63" y:9.46" w:4.01" h:0.53"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 14px
+        }
+    [Playwright] el-31 <div> {
+      text: "(no text)"
+      position: x:5.21" y:1.64" w:4.38" h:8.51"
+      background: rgba(0, 0, 0, 0)
+      borderRadius: 0px
+      fontSize: 16px
+    }
+      [Playwright] el-32 <h2> {
+        text: "КАК СТАЛО"
+        position: x:5.21" y:1.83" w:4.38" h:0.42"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 22px
+      }
+      [Playwright] el-33 <div> {
+        text: "(no text)"
+        position: x:5.21" y:2.45" w:4.38" h:1.38"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-34 <div> {
+          text: "📈"
+          position: x:5.21" y:2.45" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-35 <div> {
+          text: "(no text)"
+          position: x:5.83" y:2.45" w:3.75" h:1.38"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-36 <div> {
+            text: "Автоматизированный анализ и по..."
+            position: x:5.83" y:2.45" w:3.75" h:0.40"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-37 <div> {
+            text: "Данные собираются автоматическ..."
+            position: x:5.83" y:2.90" w:3.75" h:0.93"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+            [Playwright] el-38 <span> {
+              text: "Решение: ИАС ЭЭ БРД"
+              position: x:5.83" y:3.61" w:3.75" h:0.22"
+              background: rgba(0, 0, 0, 0)
+              borderRadius: 0px
+              fontSize: 14px
+            }
+      [Playwright] el-39 <div> {
+        text: "(no text)"
+        position: x:5.21" y:4.09" w:4.38" h:1.40"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-40 <div> {
+          text: "🧠"
+          position: x:5.21" y:4.09" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-41 <div> {
+          text: "(no text)"
+          position: x:5.83" y:4.09" w:3.75" h:1.40"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-42 <div> {
+            text: "Предиктивное управление надежн..."
+            position: x:5.83" y:4.09" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-43 <div> {
+            text: "Модели ИИ анализируют данные т..."
+            position: x:5.83" y:4.34" w:3.75" h:1.15"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+            [Playwright] el-44 <span> {
+              text: "Решение: ПРАНА / ПАПА"
+              position: x:5.83" y:5.26" w:3.75" h:0.22"
+              background: rgba(0, 0, 0, 0)
+              borderRadius: 0px
+              fontSize: 14px
+            }
+      [Playwright] el-45 <div> {
+        text: "(no text)"
+        position: x:5.21" y:5.74" w:4.38" h:1.40"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-46 <div> {
+          text: "🌐"
+          position: x:5.21" y:5.74" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-47 <div> {
+          text: "(no text)"
+          position: x:5.83" y:5.74" w:3.75" h:1.40"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-48 <div> {
+            text: ""Всевидящее" оперативное управ..."
+            position: x:5.83" y:5.74" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-49 <div> {
+            text: "Диспетчер видит всю энергосист..."
+            position: x:5.83" y:5.99" w:3.75" h:1.15"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+            [Playwright] el-50 <span> {
+              text: "Решение: СК-11 (СДУЭ)"
+              position: x:5.83" y:6.92" w:3.75" h:0.22"
+              background: rgba(0, 0, 0, 0)
+              borderRadius: 0px
+              fontSize: 14px
+            }
+      [Playwright] el-51 <div> {
+        text: "(no text)"
+        position: x:5.21" y:7.40" w:4.38" h:1.40"
+        background: rgba(0, 0, 0, 0)
+        borderRadius: 0px
+        fontSize: 16px
+      }
+        [Playwright] el-52 <div> {
+          text: "📱"
+          position: x:5.21" y:7.40" w:0.42" h:0.45"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 36px
+        }
+        [Playwright] el-53 <div> {
+          text: "(no text)"
+          position: x:5.83" y:7.40" w:3.75" h:1.40"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+          [Playwright] el-54 <div> {
+            text: "Цифровая работа "в поле""
+            position: x:5.83" y:7.40" w:3.75" h:0.20"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 16px
+          }
+          [Playwright] el-55 <div> {
+            text: "Персонал получает задания и вн..."
+            position: x:5.83" y:7.65" w:3.75" h:1.15"
+            background: rgba(0, 0, 0, 0)
+            borderRadius: 0px
+            fontSize: 14px
+          }
+            [Playwright] el-56 <span> {
+              text: "Решение: Мобильный энергетик"
+              position: x:5.83" y:8.58" w:3.75" h:0.22"
+              background: rgba(0, 0, 0, 0)
+              borderRadius: 0px
+              fontSize: 14px
+            }
+      [Playwright] el-57 <div> {
+        text: "(no text)"
+        position: x:5.21" y:9.05" w:4.38" h:1.09"
+        background: rgb(232, 245, 233)
+        borderRadius: 8px
+        fontSize: 16px
+      }
+        [Playwright] el-58 <div> {
+          text: "Прогнозируемый эффект:"
+          position: x:5.42" y:9.21" w:4.01" h:0.20"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 16px
+        }
+        [Playwright] el-59 <div> {
+          text: "Снижение ТРЗ на **Х%**, сокращ..."
+          position: x:5.42" y:9.46" w:4.01" h:0.53"
+          background: rgba(0, 0, 0, 0)
+          borderRadius: 0px
+          fontSize: 14px
+        }
+[ConversionPipeline] Filtering decorative wrapper elements...
+[ConversionPipeline] Filtered: 0 decorative elements removed, 1 top-level elements kept
+[ConversionPipeline] Playwright-based parsing complete: 1
+[ConversionPipeline] Step 2: Classifying elements
+[Classifier] el-3 <h1> → text { text: "Ключевой результат: Трансформация бизнес", reason: 'text tag or content-only' }
+[Classifier] el-4 <p> → text { text: "Переход от реактивного управления и разр", reason: 'text tag or content-only' }
+[Classifier] el-2 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-7 <h2> → text { text: "КАК БЫЛО", reason: 'text tag or content-only' }
+[Classifier] el-9 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "📄", reason: 'default rectangle' }
+[Classifier] el-11 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Ручной сбор и анализ данных", reason: 'default rectangle' }
+[Classifier] el-12 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Данные по энергопотреблению и режимам со", reason: 'default rectangle' }
+[Classifier] el-10 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-8 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-14 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "⚙️", reason: 'default rectangle' }
+[Classifier] el-16 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Реактивное управление надежностью", reason: 'default rectangle' }
+[Classifier] el-17 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Ремонты проводились по жесткому графику ", reason: 'default rectangle' }
+[Classifier] el-15 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-13 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-19 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "📞", reason: 'default rectangle' }
+[Classifier] el-21 <div> → rect ⚠️ TEXT WILL BE LOST! { text: ""Слепое" оперативное управление", reason: 'default rectangle' }
+[Classifier] el-22 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Диспетчер не видел полную картину сети в", reason: 'default rectangle' }
+[Classifier] el-20 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-18 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-24 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "🚶", reason: 'default rectangle' }
+[Classifier] el-26 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Бумажная работа "в поле"", reason: 'default rectangle' }
+[Classifier] el-27 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Электромонтеры заполняли бумажные журнал", reason: 'default rectangle' }
+[Classifier] el-25 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-23 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-29 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Итог:", reason: 'default rectangle' }
+[Classifier] el-30 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Высокие трудозатраты, длительное время р", reason: 'default rectangle' }
+[Classifier] el-28 <div> → roundRect { text: "(no text)", reason: 'border-radius: 8px' }
+  → roundRect details: position=(0.42", 9.05", 4.38", 1.09"), borderRadius=8px, bg=rgb(255, 235, 238)
+[Classifier] el-6 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-32 <h2> → text { text: "КАК СТАЛО", reason: 'text tag or content-only' }
+[Classifier] el-34 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "📈", reason: 'default rectangle' }
+[Classifier] el-36 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Автоматизированный анализ и поиск потенц", reason: 'default rectangle' }
+[Classifier] el-38 <span> → text { text: "Решение: ИАС ЭЭ БРД", reason: 'text tag or content-only' }
+[Classifier] el-37 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Данные собираются автоматически. Система", reason: 'default rectangle' }
+[Classifier] el-35 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-33 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-40 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "🧠", reason: 'default rectangle' }
+[Classifier] el-42 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Предиктивное управление надежностью", reason: 'default rectangle' }
+[Classifier] el-44 <span> → text { text: "Решение: ПРАНА / ПАПА", reason: 'text tag or content-only' }
+[Classifier] el-43 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Модели ИИ анализируют данные телеметрии,", reason: 'default rectangle' }
+[Classifier] el-41 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-39 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-46 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "🌐", reason: 'default rectangle' }
+[Classifier] el-48 <div> → rect ⚠️ TEXT WILL BE LOST! { text: ""Всевидящее" оперативное управление", reason: 'default rectangle' }
+[Classifier] el-50 <span> → text { text: "Решение: СК-11 (СДУЭ)", reason: 'text tag or content-only' }
+[Classifier] el-49 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Диспетчер видит всю энергосистему на мне", reason: 'default rectangle' }
+[Classifier] el-47 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-45 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-52 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "📱", reason: 'default rectangle' }
+[Classifier] el-54 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Цифровая работа "в поле"", reason: 'default rectangle' }
+[Classifier] el-56 <span> → text { text: "Решение: Мобильный энергетик", reason: 'text tag or content-only' }
+[Classifier] el-55 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Персонал получает задания и вносит резул", reason: 'default rectangle' }
+[Classifier] el-53 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-51 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-58 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Прогнозируемый эффект:", reason: 'default rectangle' }
+[Classifier] el-59 <div> → rect ⚠️ TEXT WILL BE LOST! { text: "Снижение ТРЗ на **Х%**, сокращение авари", reason: 'default rectangle' }
+[Classifier] el-57 <div> → roundRect { text: "(no text)", reason: 'border-radius: 8px' }
+  → roundRect details: position=(5.21", 9.05", 4.38", 1.09"), borderRadius=8px, bg=rgb(232, 245, 233)
+[Classifier] el-31 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-5 <div> → rect { text: "(no text)", reason: 'default rectangle' }
+[Classifier] el-1 <div> → roundRect { text: "(no text)", reason: 'border-radius: 10px' }
+  → roundRect details: position=(0.00", 0.00", 10.00", 10.57"), borderRadius=10px, bg=rgb(255, 255, 255)
+  → ⚠️ HUGE roundRect! This might be a decorative wrapper that should be filtered out!
+[ConversionPipeline] Classified element count: 59
+[ConversionPipeline] Step 2.5: Validating slide bounds
+  ⚠️ el-1 <div> outside bounds: bottom edge at 10.57" > 7.5"
+  ⚠️ el-5 <div> outside bounds: bottom edge at 10.15" > 7.5"
+  ⚠️ el-6 <div> outside bounds: bottom edge at 10.15" > 7.5"
+  ⚠️ el-28 <div> outside bounds: bottom edge at 10.15" > 7.5"
+  ⚠️ el-29 <div> outside bounds: bottom edge at 9.41" > 7.5"
+  ⚠️ el-30 <div> outside bounds: bottom edge at 9.99" > 7.5"
+  ⚠️ el-31 <div> outside bounds: bottom edge at 10.15" > 7.5"
+  ⚠️ el-51 <div> outside bounds: bottom edge at 8.79" > 7.5"
+  ⚠️ el-52 <div> outside bounds: bottom edge at 7.85" > 7.5"
+  ⚠️ el-53 <div> outside bounds: bottom edge at 8.79" > 7.5"
+  ⚠️ el-54 <div> outside bounds: bottom edge at 7.60" > 7.5"
+  ⚠️ el-55 <div> outside bounds: bottom edge at 8.79" > 7.5"
+  ⚠️ el-56 <span> outside bounds: bottom edge at 8.79" > 7.5"
+  ⚠️ el-57 <div> outside bounds: bottom edge at 10.15" > 7.5"
+  ⚠️ el-58 <div> outside bounds: bottom edge at 9.41" > 7.5"
+  ⚠️ el-59 <div> outside bounds: bottom edge at 9.99" > 7.5"
+[ConversionPipeline] 16 elements outside slide bounds!
+[ConversionPipeline] Step 3: Converting styles
+[StyleConverter] Converting styles for el-1 <div>
+  → Background color: rgb(255, 255, 255) → #FFFFFF
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-2 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-3 <h1>
+  → Font size: 28px → 21pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-4 <p>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-5 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-6 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-7 <h2>
+  → Font size: 22px → 17pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-8 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-9 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-10 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-11 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-12 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-13 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-14 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-15 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-16 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-17 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-18 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-19 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-20 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-21 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-22 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-23 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-24 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-25 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-26 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-27 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-28 <div>
+  → Background color: rgb(255, 235, 238) → #FFEBEE
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-29 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-30 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-31 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-32 <h2>
+  → Font size: 22px → 17pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-33 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-34 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-35 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-36 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-37 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-38 <span>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-39 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-40 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-41 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-42 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-43 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-44 <span>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-45 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-46 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-47 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-48 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-49 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-50 <span>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-51 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-52 <div>
+  → Font size: 36px → 27pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-53 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-54 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-55 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-56 <span>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: start → left
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-57 <div>
+  → Background color: rgb(232, 245, 233) → #E8F5E9
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-58 <div>
+  → Font size: 16px → 12pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Font weight: 700 → bold
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[StyleConverter] Converting styles for el-59 <div>
+  → Font size: 14px → 11pt
+  → Font family: "Roboto", Arial, sans-serif → Roboto
+  → Text align: center → center
+  → Skipping non-uniform borders (e.g., border-bottom only)
+[ConversionPipeline] Styles converted successfully
+[ConversionPipeline] Step 3.5: Logging element transformations
+[ConversionPipeline] Step 4: Generating PPTX
+[PPTXGenerator] Adding 1 elements to slide
+[PPTXGenerator] Adding roundRect at (0.00, 0.00) 10.00x10.57 no text
+  → Styles: fill=FFFFFF, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding rect at (0.42, 0.42) 9.17x0.80 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding text at (0.42, 0.42) 9.17x0.35 with text: "Ключевой результат: Трансформа..."
+  → Styles: no fill, no line
+[PPTXGenerator] Adding text at (0.42, 0.82) 9.17x0.40 with text: "Переход от реактивного управле..."
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (0.42, 1.64) 9.17x8.51 no text
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding rect at (0.42, 1.64) 4.38x8.51 no text
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding text at (0.42, 1.83) 4.38x0.42 with text: "КАК БЫЛО"
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (0.42, 2.45) 4.38x0.91 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (0.42, 2.45) 0.42x0.45 with text: "📄"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "📄" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "📄"
+[PPTXGenerator] Adding rect at (1.04, 2.45) 3.75x0.91 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (1.04, 2.45) 3.75x0.20 with text: "Ручной сбор и анализ данных"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Ручной сбор и анализ данных" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Ручной сбор и анализ данных"
+[PPTXGenerator] Adding rect at (1.04, 2.70) 3.75x0.66 with text: "Данные по энергопотреблению и ..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Данные по энергопотреблению и режимам собирались вручную в Excel. Анализ занимал недели, отчеты готовились раз в квартал." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Данные по энергопотреблению и режимам собирались вручную в Excel. Анализ занимал недели, отчеты готовились раз в квартал."
+[PPTXGenerator] Adding rect at (0.42, 3.62) 4.38x1.13 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (0.42, 3.62) 0.42x0.45 with text: "⚙️"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "⚙️" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "⚙️"
+[PPTXGenerator] Adding rect at (1.04, 3.62) 3.75x1.13 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (1.04, 3.62) 3.75x0.20 with text: "Реактивное управление надежнос..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Реактивное управление надежностью" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Реактивное управление надежностью"
+[PPTXGenerator] Adding rect at (1.04, 3.87) 3.75x0.88 with text: "Ремонты проводились по жестком..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Ремонты проводились по жесткому графику (ППР) или после аварийного отказа. Отсутствовал инструмент для прогнозирования поломок." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Ремонты проводились по жесткому графику (ППР) или после аварийного отказа. Отсутствовал инструмент для прогнозирования поломок."
+[PPTXGenerator] Adding rect at (0.42, 5.00) 4.38x0.91 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (0.42, 5.00) 0.42x0.45 with text: "📞"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "📞" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "📞"
+[PPTXGenerator] Adding rect at (1.04, 5.00) 3.75x0.91 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (1.04, 5.00) 3.75x0.20 with text: ""Слепое" оперативное управлени..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text ""Слепое" оперативное управление" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: ""Слепое" оперативное управление"
+[PPTXGenerator] Adding rect at (1.04, 5.25) 3.75x0.66 with text: "Диспетчер не видел полную карт..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Диспетчер не видел полную картину сети в реальном времени. Поиск причин аварий занимал часы и требовал выезда бригад." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Диспетчер не видел полную картину сети в реальном времени. Поиск причин аварий занимал часы и требовал выезда бригад."
+[PPTXGenerator] Adding rect at (0.42, 6.17) 4.38x0.91 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (0.42, 6.17) 0.42x0.45 with text: "🚶"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "🚶" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "🚶"
+[PPTXGenerator] Adding rect at (1.04, 6.17) 3.75x0.91 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (1.04, 6.17) 3.75x0.20 with text: "Бумажная работа "в поле""
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Бумажная работа "в поле"" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Бумажная работа "в поле""
+[PPTXGenerator] Adding rect at (1.04, 6.42) 3.75x0.66 with text: "Электромонтеры заполняли бумаж..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Электромонтеры заполняли бумажные журналы и листы осмотра, которые затем вручную переносились в системы." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Электромонтеры заполняли бумажные журналы и листы осмотра, которые затем вручную переносились в системы."
+[PPTXGenerator] Adding roundRect at (0.42, 9.05) 4.38x1.09 no text
+  → Styles: fill=FFEBEE, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding rect at (0.63, 9.21) 4.01x0.20 with text: "Итог:"
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "Итог:" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Итог:"
+[PPTXGenerator] Adding rect at (0.63, 9.46) 4.01x0.53 with text: "Высокие трудозатраты, длительн..."
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "Высокие трудозатраты, длительное время реакции на инциденты, упущенные возможности для оптимизации." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Высокие трудозатраты, длительное время реакции на инциденты, упущенные возможности для оптимизации."
+[PPTXGenerator] Adding rect at (5.21, 1.64) 4.38x8.51 no text
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding text at (5.21, 1.83) 4.38x0.42 with text: "КАК СТАЛО"
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 2.45) 4.38x1.38 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 2.45) 0.42x0.45 with text: "📈"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "📈" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "📈"
+[PPTXGenerator] Adding rect at (5.83, 2.45) 3.75x1.38 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.83, 2.45) 3.75x0.40 with text: "Автоматизированный анализ и по..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Автоматизированный анализ и поиск потенциала" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Автоматизированный анализ и поиск потенциала"
+[PPTXGenerator] Adding rect at (5.83, 2.90) 3.75x0.93 with text: "Данные собираются автоматическ..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Данные собираются автоматически. Система находит неэффективные объекты и рассчитывает потенциал экономии." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Данные собираются автоматически. Система находит неэффективные объекты и рассчитывает потенциал экономии."
+[PPTXGenerator] Adding text at (5.83, 3.61) 3.75x0.22 with text: "Решение: ИАС ЭЭ БРД"
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 4.09) 4.38x1.40 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 4.09) 0.42x0.45 with text: "🧠"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "🧠" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "🧠"
+[PPTXGenerator] Adding rect at (5.83, 4.09) 3.75x1.40 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.83, 4.09) 3.75x0.20 with text: "Предиктивное управление надежн..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Предиктивное управление надежностью" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Предиктивное управление надежностью"
+[PPTXGenerator] Adding rect at (5.83, 4.34) 3.75x1.15 with text: "Модели ИИ анализируют данные т..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Модели ИИ анализируют данные телеметрии, прогнозируют отказы оборудования и формируют рекомендации на упреждающий ремонт." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Модели ИИ анализируют данные телеметрии, прогнозируют отказы оборудования и формируют рекомендации на упреждающий ремонт."
+[PPTXGenerator] Adding text at (5.83, 5.26) 3.75x0.22 with text: "Решение: ПРАНА / ПАПА"
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 5.74) 4.38x1.40 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 5.74) 0.42x0.45 with text: "🌐"
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "🌐" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "🌐"
+[PPTXGenerator] Adding rect at (5.83, 5.74) 3.75x1.40 no text
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.83, 5.74) 3.75x0.20 with text: ""Всевидящее" оперативное управ..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text ""Всевидящее" оперативное управление" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: ""Всевидящее" оперативное управление"
+[PPTXGenerator] Adding rect at (5.83, 5.99) 3.75x1.15 with text: "Диспетчер видит всю энергосист..."
+  → Styles: no fill, no line
+⚠️  [PPTXGenerator] Shape type "rect" has text "Диспетчер видит всю энергосистему на мнемосхеме в реальном времени, может моделировать режимы и оперативно реагировать на отклонения." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Диспетчер видит всю энергосистему на мнемосхеме в реальном времени, может моделировать режимы и оперативно реагировать на отклонения."
+[PPTXGenerator] Adding text at (5.83, 6.92) 3.75x0.22 with text: "Решение: СК-11 (СДУЭ)"
+  → Styles: no fill, no line
+[PPTXGenerator] Adding rect at (5.21, 7.40) 4.38x1.40 no text
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding rect at (5.21, 7.40) 0.42x0.45 with text: "📱"
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "📱" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "📱"
+[PPTXGenerator] Adding rect at (5.83, 7.40) 3.75x1.40 no text
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding rect at (5.83, 7.40) 3.75x0.20 with text: "Цифровая работа "в поле""
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "Цифровая работа "в поле"" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Цифровая работа "в поле""
+[PPTXGenerator] Adding rect at (5.83, 7.65) 3.75x1.15 with text: "Персонал получает задания и вн..."
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "Персонал получает задания и вносит результаты осмотров через мобильное приложение, данные мгновенно попадают в систему." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Персонал получает задания и вносит результаты осмотров через мобильное приложение, данные мгновенно попадают в систему."
+[PPTXGenerator] Adding text at (5.83, 8.58) 3.75x0.22 with text: "Решение: Мобильный энергетик"
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding roundRect at (5.21, 9.05) 4.38x1.09 no text
+  → Styles: fill=E8F5E9, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+[PPTXGenerator] Adding rect at (5.42, 9.21) 4.01x0.20 with text: "Прогнозируемый эффект:"
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "Прогнозируемый эффект:" - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Прогнозируемый эффект:"
+[PPTXGenerator] Adding rect at (5.42, 9.46) 4.01x0.53 with text: "Снижение ТРЗ на **Х%**, сокращ..."
+  → Styles: no fill, no line
+  → ⚠️ Element outside slide bounds! Slide is 10" x 7.5"
+⚠️  [PPTXGenerator] Shape type "rect" has text "Снижение ТРЗ на **Х%**, сокращение аварийности на **Y%**, экономия на закупках ЭЭ до **Z млн руб/год**." - TEXT WILL BE LOST!
+    Solution: Add text as separate textbox on top of shape
+[PPTXGenerator] Adding text overlay: "Снижение ТРЗ на **Х%**, сокращение аварийности на **Y%**, экономия на закупках ЭЭ до **Z млн руб/год**."
+[ConversionPipeline] PPTX structure generated
+[ConversionPipeline] Converting to buffer...
+[ConversionPipeline] Buffer created, size: 90219
+[API] Conversion completed successfully, buffer size: 90219
+[PlaywrightLayoutCollector] Closing browser...
+9:08:11 AM [express] POST /api/convert 200 in 1943ms :: {"success":true,"logs":[{"level":"info","mes…
+[API] Pipeline cleanup completed

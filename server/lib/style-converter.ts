@@ -70,7 +70,14 @@ export class StyleConverter {
       };
       console.log(`  → Border: ${parsedElement.styles.borderWidth} ${parsedElement.styles.borderStyle} ${borderColor} → ${styles.line.width}pt ${styles.line.dashType} #${styles.line.color}`);
     } else {
-      console.log(`  → Skipping non-uniform borders (e.g., border-bottom only)`);
+      // Check for single-sided borders (border-bottom, border-left, etc.)
+      const singleSidedBorders = this.extractSingleSidedBorders(parsedElement);
+      if (singleSidedBorders.length > 0) {
+        styles.singleSidedBorders = singleSidedBorders;
+        console.log(`  → Single-sided borders detected: ${singleSidedBorders.map(b => b.side).join(', ')}`);
+      } else {
+        console.log(`  → Skipping non-uniform borders (e.g., border-bottom only)`);
+      }
     }
 
     // Opacity
@@ -165,6 +172,67 @@ export class StyleConverter {
     if (style === "dashed") return "dash";
     if (style === "dotted") return "dot";
     return "solid";
+  }
+
+  private extractSingleSidedBorders(parsedElement: ParsedElement): Array<{
+    side: "top" | "right" | "bottom" | "left";
+    color: string;
+    width: number;
+    dashType: "solid" | "dash" | "dot";
+    elementPosition: any;
+  }> {
+    const borders: Array<{
+      side: "top" | "right" | "bottom" | "left";
+      color: string;
+      width: number;
+      dashType: "solid" | "dash" | "dot";
+      elementPosition: any;
+    }> = [];
+    const { styles, position } = parsedElement;
+    
+    const checkBorder = (side: "top" | "right" | "bottom" | "left") => {
+      let width: string | undefined;
+      let color: string | undefined;
+      let style: string | undefined;
+      
+      if (side === "top") {
+        width = styles.borderTopWidth;
+        color = styles.borderTopColor;
+        style = styles.borderTopStyle;
+      } else if (side === "right") {
+        width = styles.borderRightWidth;
+        color = styles.borderRightColor;
+        style = styles.borderRightStyle;
+      } else if (side === "bottom") {
+        width = styles.borderBottomWidth;
+        color = styles.borderBottomColor;
+        style = styles.borderBottomStyle;
+      } else {
+        width = styles.borderLeftWidth;
+        color = styles.borderLeftColor;
+        style = styles.borderLeftStyle;
+      }
+      
+      if (width && parseFloat(width) > 0 && style && style !== "none" && color) {
+        const convertedColor = this.convertColor(color);
+        if (convertedColor) {
+          borders.push({
+            side,
+            color: convertedColor,
+            width: this.convertBorderWidth(width),
+            dashType: this.convertBorderStyle(style),
+            elementPosition: position, // Need this to calculate line coordinates
+          });
+        }
+      }
+    };
+    
+    checkBorder("top");
+    checkBorder("right");
+    checkBorder("bottom");
+    checkBorder("left");
+    
+    return borders;
   }
 
   private hasUniformBorder(styles: any): boolean {

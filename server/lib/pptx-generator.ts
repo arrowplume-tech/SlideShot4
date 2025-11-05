@@ -71,6 +71,14 @@ export class PPTXGenerator {
       };
     }
 
+    // Add single-sided borders as separate lines
+    if (styles.singleSidedBorders && styles.singleSidedBorders.length > 0) {
+      console.log(`[PPTXGenerator] Adding ${styles.singleSidedBorders.length} single-sided border(s)`);
+      for (const border of styles.singleSidedBorders) {
+        this.addSingleSidedBorder(slide, position, border);
+      }
+    }
+
     // Log what we're adding with detailed style information
     const textInfo = text ? `with text: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"` : "no text";
     const fillInfo = styles.fill ? `fill=${styles.fill}` : 'no fill';
@@ -229,6 +237,60 @@ export class PPTXGenerator {
     }
 
     slide.addText(text, textProps);
+  }
+
+  private addSingleSidedBorder(slide: any, position: any, border: any): void {
+    const { side, color, width, dashType } = border;
+    
+    let x1: number, y1: number, x2: number, y2: number;
+    
+    // Calculate line coordinates based on border side
+    switch (side) {
+      case "top":
+        x1 = position.x;
+        y1 = position.y;
+        x2 = position.x + position.width;
+        y2 = position.y;
+        break;
+      case "right":
+        x1 = position.x + position.width;
+        y1 = position.y;
+        x2 = position.x + position.width;
+        y2 = position.y + position.height;
+        break;
+      case "bottom":
+        x1 = position.x;
+        y1 = position.y + position.height;
+        x2 = position.x + position.width;
+        y2 = position.y + position.height;
+        break;
+      case "left":
+        x1 = position.x;
+        y1 = position.y;
+        x2 = position.x;
+        y2 = position.y + position.height;
+        break;
+      default:
+        console.warn(`[PPTXGenerator] Unknown border side: ${side}`);
+        return;
+    }
+    
+    console.log(`  → Adding ${side} border line from (${x1.toFixed(2)}, ${y1.toFixed(2)}) to (${x2.toFixed(2)}, ${y2.toFixed(2)}) color=#${color} width=${width}pt`);
+    
+    // Add line shape
+    const lineProps: any = {
+      x: x1,
+      y: y1,
+      w: x2 - x1,
+      h: y2 - y1,
+      line: {
+        color: color,
+        pt: width,
+        dashType: dashType,
+      },
+    };
+    
+    slide.addShape(this.pptx.ShapeType.line, lineProps);
   }
 
   async toBuffer(): Promise<Buffer> {

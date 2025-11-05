@@ -294,7 +294,20 @@ export class ConversionPipeline {
       return { filter: true, reason: `<${el.tagName}> is page wrapper, not content` };
     }
     
-    // Filter out huge elements that exceed slide bounds significantly (even by 1.5x)
+    // Filter out elements that significantly exceed slide bounds
+    // Use 10% tolerance to avoid filtering containers that are slightly larger due to borders/margins
+    const tolerance = 0.1; // 10% tolerance
+    const exceedsWidth = el.position.width > slideWidth * (1 + tolerance);
+    const exceedsHeight = el.position.height > slideHeight * (1 + tolerance);
+    
+    if (exceedsWidth || exceedsHeight) {
+      return { 
+        filter: true, 
+        reason: `element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") significantly exceeds slide size (${slideWidth}" x ${slideHeight}")`
+      };
+    }
+    
+    // Filter out huge elements that exceed slide bounds significantly
     const isHuge = el.position.width > slideWidth * 1.5 || el.position.height > slideHeight * 1.5;
     if (isHuge) {
       return { 

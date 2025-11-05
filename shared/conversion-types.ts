@@ -91,6 +91,13 @@ export interface PPTXElement {
   children?: PPTXElement[];
 }
 
+export interface SingleSidedBorder {
+  side: "top" | "right" | "bottom" | "left";
+  color: string;
+  width: number;
+  dashType: "solid" | "dash" | "dot";
+}
+
 export interface PPTXStyles {
   fill?: string;
   fillOpacity?: number;
@@ -99,6 +106,7 @@ export interface PPTXStyles {
     width: number;
     dashType?: "solid" | "dash" | "dot";
   };
+  singleSidedBorders?: SingleSidedBorder[];
   fontFace?: string;
   fontSize?: number;
   color?: string;
