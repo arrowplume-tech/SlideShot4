@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function SettingsPanelExample() {
   const [isOpen, setIsOpen] = useState(true);
   const [settings, setSettings] = useState({
-    slideWidth: 10,
+    slideWidth: 13.333,
     slideHeight: 7.5,
     preserveImages: true,
     optimizeShapes: true,

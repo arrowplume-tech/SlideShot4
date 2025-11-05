@@ -187,8 +187,8 @@ export class HTMLParser {
       if (hasLeft) {
         leftPx = this.parseDimension(el.style.left) || this.parseDimension(style.left) || 0;
       } else if (hasRight) {
-        // Right edge positioning: assume 10 inch slide width (960px @ 96dpi)
-        const slideWidth = 960;
+        // Right edge positioning: assume 13.333 inch slide width (1280px @ 96dpi - wide screen 16:9)
+        const slideWidth = 1280;
         const rightPx = this.parseDimension(el.style.right) || this.parseDimension(style.right) || 0;
         leftPx = slideWidth - widthPx - rightPx;
       }
@@ -215,7 +215,7 @@ export class HTMLParser {
         leftPx = positioningContext.originX + explicitLeft;
       } else if (hasRight) {
         // Right edge positioning - need container width (approximate for MVP)
-        const containerWidth = 960; // Default assumption
+        const containerWidth = 1280; // Default assumption (wide screen 16:9)
         const rightPx = this.parseDimension(el.style.right) || this.parseDimension(style.right) || 0;
         leftPx = positioningContext.originX + containerWidth - widthPx - rightPx;
       } else {

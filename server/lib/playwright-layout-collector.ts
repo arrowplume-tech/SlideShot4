@@ -46,10 +46,10 @@ export class PlaywrightLayoutCollector {
     const page = await this.browser!.newPage();
     
     try {
-      // Set viewport to match PowerPoint slide dimensions (10 x 7.5 inches at 96 DPI)
+      // Set viewport to match PowerPoint slide dimensions (13.333 x 7.5 inches at 96 DPI - wide screen 16:9)
       await page.setViewportSize({
-        width: 960,  // 10 inches * 96 DPI
-        height: 720, // 7.5 inches * 96 DPI
+        width: 1280,  // 13.333 inches * 96 DPI
+        height: 720,  // 7.5 inches * 96 DPI
       });
 
       console.log("[PlaywrightLayoutCollector] Setting HTML content...");
@@ -64,7 +64,7 @@ export class PlaywrightLayoutCollector {
               body { 
                 margin: 0; 
                 padding: 0; 
-                width: 960px; 
+                width: 1280px; 
                 height: 720px;
                 overflow: hidden;
               }

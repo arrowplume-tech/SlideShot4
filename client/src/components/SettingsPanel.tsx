@@ -150,7 +150,7 @@ export default function SettingsPanel({
             variant="outline"
             onClick={() => {
               onSettingsChange({
-                slideWidth: 10,
+                slideWidth: 13.333,
                 slideHeight: 7.5,
                 preserveImages: true,
                 optimizeShapes: true,

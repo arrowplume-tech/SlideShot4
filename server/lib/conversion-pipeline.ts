@@ -33,6 +33,11 @@ export class ConversionPipeline {
           const filteredElements = this.filterDecorativeElements(browserElements as unknown as ParsedElement[]);
           parsedElements = filteredElements;
           
+          if (parsedElements.length === 0) {
+            console.warn("[ConversionPipeline] WARNING: All elements were filtered out! This may cause empty slide.");
+            this.addLog("warning", "⚠️ Все элементы были отфильтрованы. Возможно, слайд будет пустым.");
+          }
+          
           this.addLog("success", `✅ Playwright: получено ${parsedElements.length} элементов с точными позициями`);
           console.log("[ConversionPipeline] Playwright-based parsing complete:", parsedElements.length);
         } catch (browserError) {
@@ -55,9 +60,19 @@ export class ConversionPipeline {
 
       // Step 2: Classify elements
       console.log("[ConversionPipeline] Step 2: Classifying elements");
+      
+      if (parsedElements.length === 0) {
+        throw new Error("No elements to convert. All elements were filtered out or HTML is empty.");
+      }
+      
       const classifier = new ElementClassifier();
       const classifiedElements = classifier.classify(parsedElements);
       const elementCount = this.countElements(classifiedElements);
+      
+      if (elementCount === 0) {
+        throw new Error("No elements classified. Check element classification logic.");
+      }
+      
       this.addLog("success", `Classified ${elementCount} PowerPoint elements`);
       console.log("[ConversionPipeline] Classified element count:", elementCount);
       
@@ -76,6 +91,14 @@ export class ConversionPipeline {
       console.log("[ConversionPipeline] Step 3.5: Logging element transformations");
       this.addLog("info", "📊 Детальный анализ трансформации элементов:");
       this.logAllElementTransformations(parsedElements, classifiedElements);
+
+      // Step 3.6: Apply auto-scaling if content exceeds slide bounds
+      console.log("[ConversionPipeline] Step 3.6: Applying auto-scaling");
+      const scaleFactor = this.calculateAndApplyScaling(classifiedElements, options);
+      if (scaleFactor < 1) {
+        this.addLog("info", `📐 Applied scaling factor: ${(scaleFactor * 100).toFixed(1)}% to fit content on slide`);
+        console.log(`[ConversionPipeline] Applied scaling: ${(scaleFactor * 100).toFixed(1)}%`);
+      }
 
       // Step 4: Generate PPTX
       console.log("[ConversionPipeline] Step 4: Generating PPTX");
@@ -185,10 +208,12 @@ export class ConversionPipeline {
       issue = "Элемент слишком маленький (< 0.1\")";
     }
     
-    // Проверяем элементы вне слайда
+    // Проверяем элементы вне слайда (using wide screen dimensions)
+    const slideWidth = 13.333;
+    const slideHeight = 7.5;
     if (pptx.position.x < 0 || pptx.position.y < 0 || 
-        pptx.position.x + pptx.position.width > 10.5 || 
-        pptx.position.y + pptx.position.height > 8) {
+        pptx.position.x + pptx.position.width > slideWidth + 0.5 || 
+        pptx.position.y + pptx.position.height > slideHeight + 0.5) {
       status = "error";
       issue = "Элемент за пределами слайда";
     }
@@ -209,8 +234,120 @@ export class ConversionPipeline {
     return this.logs;
   }
 
+  private calculateAndApplyScaling(elements: PPTXElement[], options: ConversionOptions): number {
+    const slideWidth = options.slideWidth || 13.333;
+    const slideHeight = options.slideHeight || 7.5;
+    
+    // Calculate bounding box of all content
+    const bounds = this.calculateContentBounds(elements);
+    
+    if (!bounds) {
+      console.log("[ConversionPipeline] No content bounds calculated, skipping scaling");
+      return 1;
+    }
+
+    const { minX, minY, maxX, maxY } = bounds;
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+
+    console.log(`[ConversionPipeline] Content bounds: x=${minX.toFixed(2)} y=${minY.toFixed(2)} width=${contentWidth.toFixed(2)} height=${contentHeight.toFixed(2)}`);
+    console.log(`[ConversionPipeline] Slide size: ${slideWidth}" x ${slideHeight}"`);
+
+    // Calculate scale factors
+    const scaleX = contentWidth > 0 ? Math.min(1, slideWidth / contentWidth) : 1;
+    const scaleY = contentHeight > 0 ? Math.min(1, slideHeight / contentHeight) : 1;
+    let scale = Math.min(scaleX, scaleY);
+
+    // Apply minimum threshold (0.5 = 50% minimum)
+    const minScale = 0.5;
+    scale = Math.max(scale, minScale);
+
+    // Only apply scaling if content exceeds bounds
+    if (scale < 1) {
+      console.log(`[ConversionPipeline] Content exceeds slide bounds, applying scale: ${(scale * 100).toFixed(1)}%`);
+      
+      // Apply scaling to all elements
+      this.applyScalingToElements(elements, scale, minX, minY);
+      
+      // Recalculate bounds after scaling
+      const newBounds = this.calculateContentBounds(elements);
+      if (newBounds) {
+        const newWidth = newBounds.maxX - newBounds.minX;
+        const newHeight = newBounds.maxY - newBounds.minY;
+        console.log(`[ConversionPipeline] After scaling: width=${newWidth.toFixed(2)} height=${newHeight.toFixed(2)}`);
+        
+        // Check if still exceeds bounds
+        if (newWidth > slideWidth || newHeight > slideHeight) {
+          this.addLog("warning", `⚠️ Content still exceeds slide bounds after scaling. User may need to adjust in PowerPoint.`);
+        }
+      }
+    } else {
+      console.log(`[ConversionPipeline] Content fits within slide bounds, no scaling needed`);
+    }
+
+    return scale;
+  }
+
+  private calculateContentBounds(elements: PPTXElement[]): { minX: number; minY: number; maxX: number; maxY: number } | null {
+    if (elements.length === 0) {
+      return null;
+    }
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    const traverse = (el: PPTXElement) => {
+      const { x, y, width, height } = el.position;
+      
+      // Update bounds
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x + width);
+      maxY = Math.max(maxY, y + height);
+
+      // Recursively process children (but skip table children as they're already in the table structure)
+      if (el.children && el.type !== "table") {
+        el.children.forEach(traverse);
+      }
+    };
+
+    elements.forEach(traverse);
+
+    if (minX === Infinity) {
+      return null;
+    }
+
+    return { minX, minY, maxX, maxY };
+  }
+
+  private applyScalingToElements(elements: PPTXElement[], scale: number, originX: number, originY: number): void {
+    const scaleElement = (el: PPTXElement) => {
+      // Scale position relative to origin
+      el.position.x = originX + (el.position.x - originX) * scale;
+      el.position.y = originY + (el.position.y - originY) * scale;
+      
+      // Scale dimensions
+      el.position.width = el.position.width * scale;
+      el.position.height = el.position.height * scale;
+
+      // Scale font sizes if they exist
+      if (el.styles.fontSize) {
+        el.styles.fontSize = Math.max(6, Math.round(el.styles.fontSize * scale)); // Minimum 6pt
+      }
+
+      // Recursively scale children (but skip table children)
+      if (el.children && el.type !== "table") {
+        el.children.forEach(scaleElement);
+      }
+    };
+
+    elements.forEach(scaleElement);
+  }
+
   private validateSlideBounds(elements: ParsedElement[], options: ConversionOptions): void {
-    const slideWidth = options.slideWidth || 10;
+    const slideWidth = options.slideWidth || 13.333;
     const slideHeight = options.slideHeight || 7.5;
     let outsideCount = 0;
     
@@ -249,7 +386,7 @@ export class ConversionPipeline {
   private filterDecorativeElements(elements: ParsedElement[]): ParsedElement[] {
     console.log("[ConversionPipeline] Filtering decorative wrapper elements...");
     
-    const slideWidth = 10;
+    const slideWidth = 13.333;
     const slideHeight = 7.5;
     let filteredCount = 0;
     
@@ -294,13 +431,22 @@ export class ConversionPipeline {
       return { filter: true, reason: `<${el.tagName}> is page wrapper, not content` };
     }
     
-    // Filter out elements that significantly exceed slide bounds
-    // Use 10% tolerance to avoid filtering containers that are slightly larger due to borders/margins
-    const tolerance = 0.1; // 10% tolerance
+    // Don't filter elements that are within reasonable bounds (even if slightly larger due to padding/margins)
+    // Only filter elements that are clearly decorative wrappers (much larger than slide)
+    const tolerance = 0.2; // 20% tolerance for containers with padding/margins
     const exceedsWidth = el.position.width > slideWidth * (1 + tolerance);
     const exceedsHeight = el.position.height > slideHeight * (1 + tolerance);
     
-    if (exceedsWidth || exceedsHeight) {
+    // Only filter if element is MUCH larger (at least 50% larger than slide)
+    // This prevents filtering legitimate content containers
+    if (exceedsWidth && el.position.width > slideWidth * 1.5) {
+      return { 
+        filter: true, 
+        reason: `element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") significantly exceeds slide size (${slideWidth}" x ${slideHeight}")`
+      };
+    }
+    
+    if (exceedsHeight && el.position.height > slideHeight * 1.5) {
       return { 
         filter: true, 
         reason: `element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") significantly exceeds slide size (${slideWidth}" x ${slideHeight}")`
@@ -308,11 +454,11 @@ export class ConversionPipeline {
     }
     
     // Filter out huge elements that exceed slide bounds significantly
-    const isHuge = el.position.width > slideWidth * 1.5 || el.position.height > slideHeight * 1.5;
+    const isHuge = el.position.width > slideWidth * 2 || el.position.height > slideHeight * 2;
     if (isHuge) {
       return { 
         filter: true, 
-        reason: `HUGE element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") exceeds 1.5x slide size`
+        reason: `HUGE element (${el.position.width.toFixed(2)}" x ${el.position.height.toFixed(2)}") exceeds 2x slide size`
       };
     }
     

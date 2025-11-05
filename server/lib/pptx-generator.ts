@@ -11,11 +11,11 @@ export class PPTXGenerator {
     this.pptx = new PptxConstructor();
     this.options = options;
     
-    // Set slide dimensions
+    // Set slide dimensions (wide screen 16:9 - 33.87 cm x 19.05 cm = 13.333" x 7.5")
     this.pptx.layout = "LAYOUT_WIDE";
     this.pptx.defineLayout({
       name: "CUSTOM",
-      width: options.slideWidth || 10,
+      width: options.slideWidth || 13.333,
       height: options.slideHeight || 7.5,
     });
     this.pptx.layout = "CUSTOM";
@@ -88,7 +88,7 @@ export class PPTXGenerator {
     console.log(`  → Styles: ${fillInfo}, ${lineInfo}`);
     
     // Warning for elements outside slide bounds
-    const slideWidth = this.options.slideWidth || 10;
+    const slideWidth = this.options.slideWidth || 13.333;
     const slideHeight = this.options.slideHeight || 7.5;
     
     if (position.x < 0 || position.y < 0 || 
@@ -111,6 +111,10 @@ export class PPTXGenerator {
     switch (type) {
       case "text":
         this.addTextBox(slide, element, commonProps);
+        break;
+      
+      case "table":
+        this.addTable(slide, element, commonProps);
         break;
       
       case "rect":
@@ -237,6 +241,161 @@ export class PPTXGenerator {
     }
 
     slide.addText(text, textProps);
+  }
+
+  private addTable(slide: any, element: PPTXElement, props: any): void {
+    if (!element.tableData) {
+      console.warn(`[PPTXGenerator] Table element ${element.id} has no tableData!`);
+      return;
+    }
+
+    const { tableData } = element;
+    const { rows, numCols } = tableData;
+
+    // Convert TableData to PptxGenJS format
+    // PptxGenJS expects: rows[row][col] where each cell is { text: string, options: {...} }
+    const pptxRows: any[][] = [];
+
+    for (const row of rows) {
+      const pptxRow: any[] = [];
+      for (const cell of row.cells) {
+        const cellOptions: any = {};
+
+        // Text content
+        const cellText = cell.text || "";
+
+        // Cell fill color
+        if (cell.styles.fill) {
+          cellOptions.fill = { color: cell.styles.fill };
+        }
+
+        // Text color
+        if (cell.styles.color) {
+          cellOptions.color = cell.styles.color;
+        } else {
+          cellOptions.color = "000000"; // Default black
+        }
+
+        // Font properties
+        if (cell.styles.fontSize) {
+          cellOptions.fontSize = cell.styles.fontSize;
+        }
+        if (cell.styles.fontFace) {
+          cellOptions.fontFace = cell.styles.fontFace;
+        }
+        if (cell.styles.bold) {
+          cellOptions.bold = true;
+        }
+        if (cell.styles.italic) {
+          cellOptions.italic = true;
+        }
+
+        // Alignment
+        if (cell.styles.align) {
+          cellOptions.align = cell.styles.align;
+        } else {
+          cellOptions.align = "left";
+        }
+
+        // Vertical alignment
+        cellOptions.valign = "middle";
+
+        // Border
+        if (cell.styles.line) {
+          cellOptions.border = {
+            type: "solid",
+            color: cell.styles.line.color || "000000",
+            pt: cell.styles.line.width || 1,
+          };
+        } else {
+          // Default border
+          cellOptions.border = {
+            type: "solid",
+            color: "EEF2F6",
+            pt: 1,
+          };
+        }
+
+        // Header row styling (darker background, bold text)
+        if (cell.isHeader) {
+          if (!cellOptions.fill) {
+            cellOptions.fill = { color: "6C757D" }; // Default header background
+          }
+          if (!cellOptions.color) {
+            cellOptions.color = "FFFFFF"; // White text for dark headers
+          }
+          cellOptions.bold = true;
+        }
+
+        // Create cell object for PptxGenJS
+        pptxRow.push({
+          text: cellText,
+          options: cellOptions,
+        });
+      }
+
+      // Ensure row has correct number of columns
+      while (pptxRow.length < numCols) {
+        pptxRow.push({
+          text: "",
+          options: {
+            border: { type: "solid", color: "EEF2F6", pt: 1 },
+          },
+        });
+      }
+
+      pptxRows.push(pptxRow);
+    }
+
+    // Table options
+    const tableOptions: any = {
+      x: props.x,
+      y: props.y,
+      w: props.w,
+      h: props.h,
+      colW: props.w / numCols, // Equal column widths
+      border: { type: "solid", color: "EEF2F6", pt: 1 },
+    };
+
+    console.log(`[PPTXGenerator] Adding table: ${rows.length} rows x ${numCols} columns at (${props.x.toFixed(2)}, ${props.y.toFixed(2)})`);
+
+    try {
+      slide.addTable(pptxRows, tableOptions);
+      console.log(`[PPTXGenerator] Table added successfully`);
+    } catch (error) {
+      console.error(`[PPTXGenerator] Error adding table:`, error);
+      // Fallback: add as text boxes
+      this.addTableAsTextboxes(slide, pptxRows, tableOptions);
+    }
+  }
+
+  private addTableAsTextboxes(slide: any, rows: any[][], options: any): void {
+    // Fallback method if addTable fails
+    console.warn(`[PPTXGenerator] Falling back to text boxes for table`);
+    const numCols = rows[0]?.length || 0;
+    const colWidth = options.w / numCols;
+    const rowHeight = options.h / rows.length;
+
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      const row = rows[rowIndex];
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const cell = row[colIndex];
+        const cellOptions = cell.options || {};
+
+        slide.addText(cell.text || "", {
+          x: options.x + colIndex * colWidth,
+          y: options.y + rowIndex * rowHeight,
+          w: colWidth,
+          h: rowHeight,
+          fontSize: cellOptions.fontSize || 10,
+          color: cellOptions.color || "000000",
+          align: cellOptions.align || "left",
+          valign: "middle",
+          bold: cellOptions.bold || false,
+          fill: cellOptions.fill || { color: "FFFFFF" },
+        });
+      }
+    }
   }
 
   private addSingleSidedBorder(slide: any, position: any, border: any): void {

@@ -22,9 +22,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { html, options } = validation.data;
 
-      // Ensure we have proper defaults
+      // Ensure we have proper defaults (wide screen 16:9 - 33.87 cm x 19.05 cm = 13.333" x 7.5")
       const conversionOptions = {
-        slideWidth: options?.slideWidth || 10,
+        slideWidth: options?.slideWidth || 13.333,
         slideHeight: options?.slideHeight || 7.5,
         preserveImages: options?.preserveImages ?? true,
         optimizeShapes: options?.optimizeShapes ?? true,

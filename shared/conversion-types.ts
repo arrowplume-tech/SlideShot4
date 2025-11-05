@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // Conversion request from frontend
 export const conversionOptionsSchema = z.object({
-  slideWidth: z.number().optional().default(10),
+  slideWidth: z.number().optional().default(13.333),
   slideHeight: z.number().optional().default(7.5),
   preserveImages: z.boolean().optional().default(true),
   optimizeShapes: z.boolean().optional().default(true),
@@ -80,7 +80,23 @@ export type PPTXShapeType =
   | "ellipse"
   | "triangle"
   | "line"
-  | "text";
+  | "text"
+  | "table";
+
+export interface TableCell {
+  text: string;
+  isHeader: boolean;
+  styles: PPTXStyles;
+}
+
+export interface TableRow {
+  cells: TableCell[];
+}
+
+export interface TableData {
+  rows: TableRow[];
+  numCols: number;
+}
 
 export interface PPTXElement {
   id: string;
@@ -89,6 +105,7 @@ export interface PPTXElement {
   styles: PPTXStyles;
   text?: string;
   children?: PPTXElement[];
+  tableData?: TableData;
 }
 
 export interface SingleSidedBorder {

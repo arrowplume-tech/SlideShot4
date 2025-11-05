@@ -171,7 +171,7 @@ export default function Home() {
   ]);
 
   const [settings, setSettings] = useState({
-    slideWidth: 10,
+    slideWidth: 13.333,
     slideHeight: 7.5,
     preserveImages: true,
     optimizeShapes: true,
