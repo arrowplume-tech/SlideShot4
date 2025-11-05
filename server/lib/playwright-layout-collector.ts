@@ -125,31 +125,52 @@ export class PlaywrightLayoutCollector {
           // Try to get background from inline style first (for gradients), then computed style
           var finalBackground = '';
           
-          // First check inline style (most reliable for gradients)
-          var inlineBackground = element.style.background || element.style.backgroundImage || element.style.backgroundColor;
-          if (inlineBackground && inlineBackground !== 'none' && inlineBackground !== 'transparent' && inlineBackground !== 'rgba(0, 0, 0, 0)') {
-            finalBackground = inlineBackground;
-          } else {
-            // Fallback to computed style
+          // Method 1: Check inline style attribute (for style="background: ...")
+          var inlineStyle = element.getAttribute('style');
+          if (inlineStyle) {
+            var bgMatch = inlineStyle.match(/background\s*:\s*([^;]+)/i) || inlineStyle.match(/background-image\s*:\s*([^;]+)/i);
+            if (bgMatch && bgMatch[1].includes('gradient')) {
+              finalBackground = bgMatch[1].trim();
+            }
+          }
+          
+          // Method 2: Check element.style properties (for JS-set styles)
+          if (!finalBackground) {
+            var inlineBackground = element.style.background || element.style.backgroundImage || element.style.backgroundColor;
+            if (inlineBackground && inlineBackground !== 'none' && inlineBackground !== 'transparent' && inlineBackground !== 'rgba(0, 0, 0, 0)') {
+              finalBackground = inlineBackground;
+            }
+          }
+          
+          // Method 3: Check computed background-image (for CSS gradients)
+          if (!finalBackground || !finalBackground.includes('gradient')) {
             var bgImage = style.backgroundImage || style.getPropertyValue('background-image');
-            var bgColor = style.backgroundColor;
-            
             if (bgImage && bgImage !== 'none' && bgImage.includes('gradient')) {
               finalBackground = bgImage;
-            } else if (bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)') {
+            }
+          }
+          
+          // Method 4: Check computed background shorthand
+          if (!finalBackground || !finalBackground.includes('gradient')) {
+            var backgroundShorthand = style.getPropertyValue('background');
+            if (backgroundShorthand && backgroundShorthand !== 'none' && backgroundShorthand.includes('gradient')) {
+              finalBackground = backgroundShorthand;
+            }
+          }
+          
+          // Method 5: Fallback to backgroundColor if no gradient found
+          if (!finalBackground) {
+            var bgColor = style.backgroundColor;
+            if (bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)') {
               finalBackground = bgColor;
-            } else {
-              // Try to get background shorthand from computed style
-              var backgroundShorthand = style.getPropertyValue('background');
-              if (backgroundShorthand && backgroundShorthand !== 'none' && backgroundShorthand.includes('gradient')) {
-                finalBackground = backgroundShorthand;
-              }
             }
           }
           
           // Log gradient detection for debugging
           if (finalBackground && finalBackground.includes('gradient')) {
-            console.log(`[Playwright] Gradient detected for ${element.tagName}: ${finalBackground.substring(0, 60)}...`);
+            console.log('[Playwright] Gradient detected for ' + element.tagName + ': ' + finalBackground.substring(0, 80) + '...');
+          } else if (finalBackground && finalBackground !== 'transparent' && finalBackground !== 'rgba(0, 0, 0, 0)') {
+            console.log('[Playwright] Background for ' + element.tagName + ': ' + finalBackground.substring(0, 60) + '...');
           }
 
           var data = {

@@ -89,6 +89,11 @@ export class PPTXGenerator {
           commonProps.fill.transparency = Math.round((1 - styles.fillOpacity) * 100);
         }
       }
+    } else if (type === 'roundRect' || type === 'rect') {
+      // If shape has no fill but is a visible shape (not text), add a default light fill
+      // This prevents invisible shapes (especially for gradient backgrounds that weren't detected)
+      console.log(`[PPTXGenerator] No fill detected for ${type}, adding default light gray fill`);
+      commonProps.fill = { color: 'E0E0E0' }; // Light gray as fallback
     }
 
     // Add border
