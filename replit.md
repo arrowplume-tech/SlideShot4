@@ -123,7 +123,25 @@ npx playwright install firefox
 
 ## Recent Changes (November 2025)
 
-### Автоматическая установка Playwright (November 4, 2025 - Latest)
+### Single-Sided Border Support & Improved Filtering (November 5, 2025 - Latest)
+- ✅ **Single-Sided Border Rendering**: 
+  - Added support for border-bottom, border-left, border-top, border-right as separate line shapes
+  - Elements like "КАК БЫЛО"/"КАК СТАЛО" with only border-bottom now render correctly
+  - Vertical accent bars (border-left on "Итог:" blocks) now appear in PowerPoint
+  - New `SingleSidedBorder` type and `singleSidedBorders` field in PPTXStyles
+- ✅ **Improved Element Filtering**:
+  - Added 10% tolerance to slide bounds checking (prevents filtering legitimate containers)
+  - Containers slightly larger than slide (due to borders/margins) are now preserved
+  - Giant decorative elements (10.57" oval backgrounds) still filtered correctly
+  - Prevents loss of border-bearing containers during conversion
+- ✅ **Border Detection Logic**:
+  - Added `hasUniformBorder()` check - only applies full border if all 4 sides are identical
+  - Elements with mixed borders (e.g., only bottom) extract individual sides
+  - New `extractSingleSidedBorders()` method in StyleConverter
+  - New `addSingleSidedBorder()` method in PPTXGenerator draws lines using element coordinates
+- 🎯 **Goal Achieved**: Pixel-perfect border rendering matching HTML preview
+
+### Автоматическая установка Playwright (November 4, 2025)
 - ✅ **Добавлен postinstall скрипт**: Автоматическая установка Firefox при `npm install`
 - ✅ **Создан README.md**: Подробные инструкции для новых пользователей
 - ✅ **Критическое исправление**: Предотвращение использования JSDOM вместо Playwright
