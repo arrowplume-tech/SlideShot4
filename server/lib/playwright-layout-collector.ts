@@ -158,11 +158,32 @@ export class PlaywrightLayoutCollector {
             }
           }
           
-          // Method 5: Fallback to backgroundColor if no gradient found
+          // Method 5: Check computed backgroundColor (for solid colors)
           if (!finalBackground) {
             var bgColor = style.backgroundColor;
-            if (bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)') {
+            // Also try getPropertyValue for better color extraction
+            var bgColorProp = style.getPropertyValue('background-color');
+            bgColor = bgColorProp || bgColor;
+            
+            if (bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'rgb(0, 0, 0)') {
               finalBackground = bgColor;
+            }
+          }
+          
+          // Method 6: Check if element has a background from CSS classes (not inline)
+          // Sometimes computed style.backgroundColor doesn't work, try all CSS properties
+          if (!finalBackground) {
+            var allBgProps = [
+              style.getPropertyValue('background'),
+              style.getPropertyValue('background-color'),
+              style.getPropertyValue('background-image'),
+              element.style?.background,
+              element.style?.backgroundColor,
+              element.style?.backgroundImage
+            ].filter(function(v) { return v && v !== 'none' && v !== 'transparent' && v !== 'rgba(0, 0, 0, 0)'; });
+            
+            if (allBgProps.length > 0) {
+              finalBackground = allBgProps[0];
             }
           }
           

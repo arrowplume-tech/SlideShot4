@@ -7,6 +7,18 @@ export class ElementClassifier {
 
   private classifyElement(element: ParsedElement): PPTXElement {
     const shapeType = this.determineShapeType(element);
+    
+    // Skip elements marked for skipping
+    if (shapeType === "skip") {
+      // Return a minimal element that will be filtered out later
+      return {
+        id: element.id,
+        type: "skip",
+        position: element.position,
+        styles: {},
+        text: "",
+      };
+    }
     const hasText = element.textContent.trim().length > 0 || element.tagName.match(/^(h[1-6]|p|span|a|button|label)$/);
 
     const pptxElement: PPTXElement = {
@@ -83,7 +95,53 @@ export class ElementClassifier {
       return "triangle";
     }
 
-    // Default to rectangle
+    // Skip empty decorative divs - don't create rectangles for them
+    // A div should be a rect only if it has visual properties:
+    // - Background color (not transparent)
+    // - Border (visible)
+    // - Border-radius (rounded corners)
+    const hasBackground = styles.backgroundColor && 
+      styles.backgroundColor !== "transparent" && 
+      styles.backgroundColor !== "rgba(0, 0, 0, 0)";
+    const borderWidth = styles.borderWidth ? parseFloat(styles.borderWidth) : 0;
+    const hasBorder = borderWidth > 0 && styles.borderStyle && styles.borderStyle !== "none";
+    const hasText = element.textContent && element.textContent.trim().length > 0;
+    const hasChildren = element.children && element.children.length > 0;
+    const hasBorderRadius = styles.borderRadius && parseFloat(styles.borderRadius) > 0;
+    
+    // For divs: only skip if they are truly empty decorative containers
+    // - No background, no border, no border-radius, no text
+    // - AND has children (children will be rendered separately)
+    // - BUT: if it has border-radius, it's a visual element (roundRect already handled above)
+    // - AND: if it has significant size (width > 1" or height > 1"), it might be a layout container, keep it
+    if (tagName === "div") {
+      const hasSignificantSize = element.position.width > 1 || element.position.height > 1;
+      
+      // If it has visual properties, it's not a skip
+      if (hasBackground || hasBorder || hasBorderRadius) {
+        // Already handled above (roundRect) or will be rect
+        // Continue to default logic below
+      } else if (!hasText && hasChildren && !hasSignificantSize) {
+        // Small empty container with children - skip it, children will be rendered
+        return "skip";
+      } else if (!hasText && !hasChildren) {
+        // Completely empty div - skip it
+        return "skip";
+      }
+      // If div has text or significant size, it should be rendered (handled below)
+    }
+
+    // Default to rectangle if it has visual properties
+    if (hasBackground || hasBorder) {
+      return "rect";
+    }
+
+    // If no visual properties but has text, it should be text (not rect)
+    if (hasText) {
+      return "text";
+    }
+
+    // Default to rect for other cases (fallback - better safe than sorry)
     return "rect";
   }
 
@@ -99,21 +157,28 @@ export class ElementClassifier {
       return false;
     }
 
-    // Need at least 2 children (rows)
-    if (element.children.length < 2) {
+    // Filter out heading elements (h1-h6) that might be before table rows
+    // These are titles, not table rows
+    const tableRowCandidates = element.children.filter(child => 
+      !/^h[1-6]$/i.test(child.tagName)
+    );
+
+    // Need at least 2 children (rows) after filtering out headings
+    if (tableRowCandidates.length < 2) {
       return false;
     }
 
-    // Check if all children have the same structure (same number of direct children)
-    const firstRowChildCount = element.children[0].children.length;
+    // Use filtered candidates for structure checking
+    const firstRow = tableRowCandidates[0];
+    const firstRowChildCount = firstRow.children.length;
     
     // Need at least 2 columns
     if (firstRowChildCount < 2) {
       return false;
     }
 
-    // Check if all rows have the same number of columns
-    const allRowsHaveSameColumns = element.children.every(row => row.children.length === firstRowChildCount);
+    // Check if all rows have the same number of columns (using filtered candidates)
+    const allRowsHaveSameColumns = tableRowCandidates.every(row => row.children.length === firstRowChildCount);
     
     if (!allRowsHaveSameColumns) {
       return false;
@@ -127,7 +192,7 @@ export class ElementClassifier {
       /tr/i,
     ];
 
-    const hasTableLikeClasses = element.children.some(row => 
+    const hasTableLikeClasses = tableRowCandidates.some(row => 
       tableLikePatterns.some(pattern => {
         // Check if any child has matching class name pattern in its structure
         return row.children.some(cell => 
@@ -140,20 +205,62 @@ export class ElementClassifier {
 
     // If we have consistent structure AND table-like patterns, it's likely a table
     if (hasTableLikeClasses) {
-      console.log(`[Classifier] Table-like structure detected for ${element.id}: ${element.children.length} rows, ${firstRowChildCount} columns`);
+      console.log(`[Classifier] Table-like structure detected for ${element.id}: ${tableRowCandidates.length} rows, ${firstRowChildCount} columns`);
       return true;
     }
 
     // Also check if structure is very regular (all rows have same column count and similar positioning)
     // This catches cases like detail-row without explicit class names
-    const isRegularStructure = element.children.every(row => {
+    const isRegularStructure = tableRowCandidates.every(row => {
       // All cells should be direct children
       return row.children.length === firstRowChildCount;
     });
 
-    // For very regular structures with many rows, likely a table
-    if (isRegularStructure && element.children.length >= 2 && firstRowChildCount >= 2) {
-      console.log(`[Classifier] Regular table-like structure detected for ${element.id}: ${element.children.length} rows, ${firstRowChildCount} columns`);
+    // EXCLUDE elements that are clearly NOT tables:
+    // 1. Elements with headings IN CELLS (not before rows) - likely content sections, not tables
+    const hasHeadingsInCells = tableRowCandidates.some(row => 
+      row.children && row.children.some(cell => {
+        // Check if cell or its descendants have headings
+        const hasHeading = cell.tagName && /^h[1-6]$/i.test(cell.tagName);
+        const hasNestedHeading = cell.children && cell.children.some(c => 
+          c.tagName && /^h[1-6]$/i.test(c.tagName)
+        );
+        return hasHeading || hasNestedHeading;
+      })
+    );
+
+    if (hasHeadingsInCells) {
+      return false;
+    }
+
+    // 2. Elements with complex nested content (paragraphs, spans with long text) - likely content blocks
+    const hasComplexContent = tableRowCandidates.some(row => 
+      row.children && row.children.some(cell => {
+        // Check if cell has nested text elements or complex structure
+        const hasLongText = cell.textContent && cell.textContent.trim().length > 50;
+        const hasParagraphs = cell.children && cell.children.some(c => 
+          /^p$/i.test(c.tagName) && c.textContent && c.textContent.trim().length > 30
+        );
+        return hasLongText || hasParagraphs;
+      })
+    );
+
+    if (hasComplexContent) {
+      return false;
+    }
+
+    // For very regular structures, require:
+    // - At least 2 rows (after filtering headings) AND
+    // - At least 2 columns
+    // - AND no complex content
+    const isTableLike = isRegularStructure && 
+      !hasHeadingsInCells && 
+      !hasComplexContent &&
+      tableRowCandidates.length >= 2 && 
+      firstRowChildCount >= 2;
+
+    if (isTableLike) {
+      console.log(`[Classifier] Regular table-like structure detected for ${element.id}: ${tableRowCandidates.length} rows, ${firstRowChildCount} columns`);
       return true;
     }
 
@@ -356,16 +463,24 @@ export class ElementClassifier {
     const rows: TableRow[] = [];
     let numCols = 0;
 
-    // Each child is a row
-    for (let rowIndex = 0; rowIndex < container.children.length; rowIndex++) {
-      const rowElement = container.children[rowIndex];
+    // Filter out heading elements (h1-h6) - they are titles, not table rows
+    const tableRowElements = container.children.filter(child => 
+      !/^h[1-6]$/i.test(child.tagName)
+    );
+
+    // Each child is a row (excluding headings)
+    for (let rowIndex = 0; rowIndex < tableRowElements.length; rowIndex++) {
+      const rowElement = tableRowElements[rowIndex];
       const cells: TableCell[] = [];
 
       // Each child of row is a cell
       for (const cellElement of rowElement.children) {
+        // Only mark as header if explicitly a header cell (th tag or bold font weight)
+        // Don't auto-mark first row as header - let it be determined by cell properties
+        const isHeader = this.isHeaderCell(cellElement);
         cells.push({
           text: cellElement.textContent.trim(),
-          isHeader: rowIndex === 0 || this.isHeaderCell(cellElement),
+          isHeader: isHeader,
           styles: this.extractCellStyles(cellElement),
         });
       }
@@ -380,9 +495,14 @@ export class ElementClassifier {
       return null;
     }
 
-    // Mark first row as header if it contains header-like cells
-    if (rows.length > 0 && rows[0].cells.some(cell => cell.isHeader)) {
+    // Only mark first row as header if ALL cells in it are headers
+    // This prevents marking data rows as headers
+    if (rows.length > 0 && rows[0].cells.length > 0 && rows[0].cells.every(cell => cell.isHeader)) {
+      // All cells are headers, so this is a header row
       rows[0].cells.forEach(cell => cell.isHeader = true);
+    } else if (rows.length > 0) {
+      // First row is not a header row - unmark any false positives
+      rows[0].cells.forEach(cell => cell.isHeader = false);
     }
 
     // Normalize column count

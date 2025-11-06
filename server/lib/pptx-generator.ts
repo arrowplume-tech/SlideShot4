@@ -34,6 +34,15 @@ export class PPTXGenerator {
 
   private addElementsToSlide(slide: any, elements: PPTXElement[]): void {
     for (const element of elements) {
+      // Skip elements marked for skipping
+      if (element.type === "skip") {
+        // Still process children, as they might be valid elements
+        if (element.children && element.children.length > 0) {
+          this.addElementsToSlide(slide, element.children);
+        }
+        continue;
+      }
+      
       this.addElement(slide, element);
       
       // Recursively add children
@@ -90,10 +99,9 @@ export class PPTXGenerator {
         }
       }
     } else if (type === 'roundRect' || type === 'rect') {
-      // If shape has no fill but is a visible shape (not text), add a default light fill
-      // This prevents invisible shapes (especially for gradient backgrounds that weren't detected)
-      console.log(`[PPTXGenerator] No fill detected for ${type}, adding default light gray fill`);
-      commonProps.fill = { color: 'E0E0E0' }; // Light gray as fallback
+      // DON'T add fallback fill - only use explicit fills from styles
+      // This prevents gray backgrounds on elements that should be transparent
+      // Fallback fill was causing issues with metric blocks and other elements
     }
 
     // Add border
@@ -143,6 +151,11 @@ export class PPTXGenerator {
     }
 
     switch (type) {
+      case "skip":
+        // Skip rendering for decorative containers
+        console.log(`[PPTXGenerator] Skipping element ${element.id} (decorative container)`);
+        return;
+      
       case "text":
         this.addTextBox(slide, element, commonProps);
         break;

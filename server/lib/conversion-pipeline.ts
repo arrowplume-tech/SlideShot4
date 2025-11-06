@@ -66,14 +66,19 @@ export class ConversionPipeline {
       }
       
       const classifier = new ElementClassifier();
-      const classifiedElements = classifier.classify(parsedElements);
+      let classifiedElements = classifier.classify(parsedElements);
+      
+      // Filter out skip elements and flatten the tree
+      classifiedElements = this.filterSkipElements(classifiedElements);
       const elementCount = this.countElements(classifiedElements);
       
       if (elementCount === 0) {
-        throw new Error("No elements classified. Check element classification logic.");
+        // Log detailed info for debugging
+        console.warn("[ConversionPipeline] All elements were skipped or invalid.");
+        throw new Error("No valid elements to convert. All elements were marked as skip or invalid.");
       }
       
-      this.addLog("success", `Classified ${elementCount} PowerPoint elements`);
+      this.addLog("success", `Classified ${elementCount} PowerPoint elements (after filtering skip elements)`);
       console.log("[ConversionPipeline] Classified element count:", elementCount);
       
       // Step 2.5: Validate slide bounds
@@ -161,13 +166,38 @@ export class ConversionPipeline {
   }
 
   private countElements(elements: PPTXElement[]): number {
-    let count = elements.length;
+    let count = 0;
     for (const element of elements) {
+      // Don't count "skip" elements
+      if (element.type !== "skip") {
+        count++;
+      }
       if (element.children) {
         count += this.countElements(element.children);
       }
     }
     return count;
+  }
+
+  private filterSkipElements(elements: PPTXElement[]): PPTXElement[] {
+    const filtered: PPTXElement[] = [];
+    for (const element of elements) {
+      if (element.type === "skip") {
+        // Skip this element, but process its children
+        if (element.children && element.children.length > 0) {
+          const filteredChildren = this.filterSkipElements(element.children);
+          filtered.push(...filteredChildren);
+        }
+      } else {
+        // Keep this element, but filter its children
+        const filteredElement = { ...element };
+        if (element.children && element.children.length > 0) {
+          filteredElement.children = this.filterSkipElements(element.children);
+        }
+        filtered.push(filteredElement);
+      }
+    }
+    return filtered;
   }
 
   private addLog(level: ConversionLog["level"], message: string, elementData?: ConversionLog["elementData"]): void {
