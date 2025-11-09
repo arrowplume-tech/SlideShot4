@@ -7,3 +7,4 @@ vite.config.ts.*
 
 # Playwright browsers cache
 .cache/ms-playwright
+.env
